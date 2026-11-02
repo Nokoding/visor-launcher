@@ -1,0 +1,45 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Deck 2.8 game profile design mock</title>
+<style>
+  @font-face{font-family:"Orbitron";font-weight:700;src:url(../../assets/fonts/orbitron-bold.ttf)}
+  @font-face{font-family:"OrbitronM";font-weight:500;src:url(../../assets/fonts/orbitron-medium.ttf)}
+  @font-face{font-family:"Rajdhani";font-weight:600;src:url(../../assets/fonts/rajdhani-semibold-latin.ttf)}
+  @font-face{font-family:"ShareTech";font-weight:400;src:url(../../assets/fonts/share-tech-mono.ttf)}
+  html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#07040D}
+  canvas{position:absolute;left:0;top:0}
+</style></head>
+<body><canvas id="c" width="1920" height="1080"></canvas>
+<script src="mock27.js"></script>
+<script>
+// ?p=profile: Setup, SYSTEM, GAME PROFILES, one app (Panel numbers as in the 2.6 mocks). ?p=keep: the keep or revert prompt (KeepView).
+const page=(new URLSearchParams(location.search)).get('p')||'profile';
+fonts(function(){
+sky(); skyline(mix(BG1,B,.22),820,120,260,40,90,0); c.fillStyle=rgba(BG0,0.72);c.fillRect(0,0,1920,1080);
+if(page==='keep'){
+  c.fillStyle=rgba(BG0,.6);c.fillRect(0,0,1920,1080);
+  const w=900,h=330,x=(1920-w)/2,y=(1080-h)/2;cut(x,y,x+w,y+h,30,10);c.fillStyle=rgba(PANEL,.98);c.fill();c.strokeStyle=rgba(A,.9);c.lineWidth=2;c.stroke();
+  c.font='700 30px Orbitron';c.fillStyle=A;c.fillText('//',x+40,y+70);c.fillStyle=TEXT;c.fillText('KEEP THIS DISPLAY?',x+40+c.measureText('// ').width,y+70);
+  c.font='600 38px Rajdhani';c.fillStyle=TEXT;c.fillText('ROBLOX  75 PERCENT',x+40,y+140);
+  c.font='400 20px ShareTech';c.fillStyle=DIM;c.fillText('REVERTING BY ITSELF IN 12 SECONDS',x+40,y+190);c.fillText('A KEEP IT     B PUT IT BACK NOW',x+40,y+h-40);
+  tag('DESIGN MOCK (2.8 KEEP OR REVERT PROMPT), NOT A SCREENSHOT OF THE APK');
+}else{
+  const rows=[['SCALE','75 PERCENT  1440X810  240 DPI  >'],['METHOD','DECK DISPLAY  >'],['AUTO RESTORE','ON'],['LAUNCH WITH PROFILE','ON'],['WHAT IT DOES','DECK CHANGES THE WHOLE DISPLAY WHILE THE APP IS IN FRONT'],['ADB COMMAND','ON: ADB SHELL WM SIZE 1440X810...'],['FROM A PHONE (TERMUX)','BASH GAME-PROFILE.SH TVIP:PORT COM.ROBLOX.CLIENT ON 75 DISPLAY'],['REMOVE PROFILE','>']];
+  const pw=1240,headH=108,rowH=70,helpH=34,footH=70,ph=headH+rows.length*rowH+footH+helpH,px=340,py=(1080-ph)/2,foc=0;
+  cut(px,py,px+pw,py+ph,34,10);c.fillStyle=rgba(PANEL,.97);c.fill();c.strokeStyle=rgba(A,.65);c.lineWidth=2;c.stroke();
+  const x0=px+44,x1=px+pw-44,hy=py+68;
+  c.font='700 29px Orbitron';c.fillStyle=A;c.fillText('//',x0,hy);const sl=c.measureText('// ').width;c.fillStyle=TEXT;c.fillText('ROBLOX',x0+sl,hy);
+  c.font='400 17px ShareTech';c.fillStyle=DIM;const bk='BACK';c.fillText(bk,x1-c.measureText(bk).width,hy-4);
+  c.strokeStyle=rgba(DIM,.3);c.lineWidth=1;c.beginPath();c.moveTo(x0,py+headH-14);c.lineTo(x1,py+headH-14);c.stroke();
+  rows.forEach(([lab,val],i)=>{const top=py+headH+i*rowH,l=px+28,r=px+pw-28,tt=top+6,bb=top+rowH-6,cy=(tt+bb)/2,f=i===foc;
+    c.font='600 31px Rajdhani';c.fillStyle=f?TEXT:rgba(TEXT,.74);c.fillText(lab,l+20,cy+11);
+    c.font='700 22px ShareTech';let v=val;const arrow=v.endsWith('  >');if(arrow)v=v.slice(0,-3);else if(v==='>')v='';
+    c.fillStyle=f?A:DIM;let rr=r-20;if(arrow||val==='>'){c.fillStyle=A;c.fillText('>',rr-c.measureText('>').width,cy+9);rr-=c.measureText('>').width+14;c.fillStyle=f?A:DIM;}
+    if(v){let t=v;const maxw=pw-420;while(c.measureText(t).width>maxw)t=t.slice(0,-2);if(t!==v)t=t.slice(0,-1)+'...';c.fillText(t,rr-c.measureText(t).width,cy+9);}
+    if(i<rows.length-1){c.strokeStyle=rgba(DIM,.3);c.lineWidth=1;c.beginPath();c.moveTo(l,bb+6);c.lineTo(r,bb+6);c.stroke();}
+    if(f){c.strokeStyle=A;c.lineWidth=2.5;const b=16;[[l,tt,1,1],[r,tt,-1,1],[l,bb,1,-1],[r,bb,-1,-1]].forEach(([x,y,sx,sy])=>{c.beginPath();c.moveTo(x+b*sx,y);c.lineTo(x,y);c.lineTo(x,y+b*sy);c.stroke();});}});
+  const fy=py+ph-28,hyl=fy-34;c.font='400 17px ShareTech';c.fillStyle=rgba(TEXT,.86);c.fillText('HOW MUCH OF THE FULL PICTURE SIZE THE GAME GETS, WITH THE SIZE AND DENSITY IT WOULD USE.',x0,hyl);
+  c.fillStyle=DIM;c.fillText('A SELECT   B BACK',x0,fy);
+  tag('DESIGN MOCK (2.8 GAME PROFILE, EXAMPLE VALUES), NOT A SCREENSHOT OF THE APK');
+}
+});
+</script></body></html>

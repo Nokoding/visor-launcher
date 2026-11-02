@@ -1,0 +1,81 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Deck 2.3 options flyout design mock</title>
+<style>
+  @font-face{font-family:"Orbitron";font-weight:700;src:url(../../assets/fonts/orbitron-bold.ttf)}
+  @font-face{font-family:"OrbitronM";font-weight:500;src:url(../../assets/fonts/orbitron-medium.ttf)}
+  @font-face{font-family:"Rajdhani";font-weight:600;src:url(../../assets/fonts/rajdhani-semibold-latin.ttf)}
+  @font-face{font-family:"ShareTech";font-weight:400;src:url(../../assets/fonts/share-tech-mono.ttf)}
+  html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#07040D}
+  canvas{position:absolute;left:0;top:0}
+  #mocktag{position:absolute;left:0;top:1032px;width:1920px;text-align:center;font:400 26px "ShareTech",monospace;color:#07040D}
+  #mocktag span{background:#FFE14D;padding:6px 22px;border:3px solid #07040D;outline:2px solid #FFE14D}
+</style></head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<div id="mocktag"><span>DESIGN MOCK (2.3 OPTIONS FLYOUT, MID TYPING), NOT A SCREENSHOT OF THE APK</span></div>
+<script>
+// Same layout numbers as Panel.java in flyout mode (SYNTHWAVE theme, FLYOUT SIDE LEFT, TYPE, LEFT TO RIGHT):
+// dock card 300x169 at x 110 centered on y 540, panel 760 wide 40 px right of it, header 96, rows 64, footer 62.
+const A='#FF2E97', B='#A855F7', TEXT='#F4EEFF', DIM='#A99DC6', PANEL='#120A21', BG0='#07040D', BG1='#170A2C', DANGER='#FF3B3B';
+const c = document.getElementById('c').getContext('2d');
+Promise.all(['700 29px Orbitron','600 31px Rajdhani','400 17px ShareTech'].map(f=>document.fonts.load(f))).then(draw, draw);
+function draw(){
+function rgba(hex,a){const n=parseInt(hex.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;}
+function mix(a,b,t){const x=parseInt(a.slice(1),16),y=parseInt(b.slice(1),16);const m=s=>Math.round(((x>>s)&255)*(1-t)+((y>>s)&255)*t);return `rgb(${m(16)},${m(8)},${m(0)})`;}
+function cut(l,t,r,b,big,small){const m=Math.min(r-l,b-t)*0.45;big=Math.min(big,m);small=Math.min(small,m);
+  c.beginPath();c.moveTo(l+big,t);c.lineTo(r-small,t);c.lineTo(r,t+small);c.lineTo(r,b-big);c.lineTo(r-big,b);c.lineTo(l+small,b);c.lineTo(l,b-small);c.lineTo(l,t+big);c.closePath();}
+
+// background: sky gradient, a simple skyline, grid
+const g=c.createLinearGradient(0,0,0,1080);g.addColorStop(0,BG1);g.addColorStop(1,BG0);c.fillStyle=g;c.fillRect(0,0,1920,1080);
+let seed=7;function rnd(){seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;}
+c.fillStyle=mix(mix(BG1,B,.22),BG0,.25);for(let x=0;x<1920;){const w=40+rnd()*90,h=120+rnd()*260;c.fillRect(x,820-h,w-6,h+260);x+=w;}
+c.strokeStyle=rgba(TEXT,.04);c.lineWidth=1;for(let x=0;x<=1920;x+=80){c.beginPath();c.moveTo(x,0);c.lineTo(x,1080);c.stroke();}for(let y=0;y<=1080;y+=80){c.beginPath();c.moveTo(0,y);c.lineTo(1920,y);c.stroke();}
+
+// the wheel behind, pushed back to 96 percent around the screen center; the focused tile's spot is empty (its icon flew)
+c.save();c.translate(960,540);c.scale(0.96,0.96);c.translate(-960,-540);
+const names=['NEONFLIX','PIXELTUBE','STREAMBOX','SPORTSCAST','WEBVIEW'];
+for(let i=-2;i<=2;i++){const th=i*26*Math.PI/180,x=960+Math.sin(th)*860,y=470+(1-Math.cos(th))*44,sc=1/(1+0.32*Math.abs(i)),w=560*sc,h=315*sc;
+  c.globalAlpha=i===0?0.12:0.95-0.2*Math.abs(i);cut(x-w/2,y-h/2,x+w/2,y+h/2,h*.13,h*.035);c.fillStyle=mix(PANEL,B,.3);c.fill();c.strokeStyle=rgba(A,.38);c.lineWidth=2;c.stroke();
+  c.fillStyle=TEXT;c.font=`600 ${Math.round(h*.12)}px Rajdhani`;c.textAlign='center';c.fillText(names[i+2],x,y+h*.33);c.textAlign='left';}
+c.restore();c.globalAlpha=1;
+// dim scrim
+c.fillStyle=rgba(BG0,0.72);c.fillRect(0,0,1920,1080);
+
+// docked icon card
+const dl=110,dt=540-84.5,dw=300,dh=169;
+cut(dl,dt,dl+dw,dt+dh,dh*.13,dh*.035);c.fillStyle=mix(PANEL,'#29B6F6',.3);c.fill();
+c.fillStyle='#29B6F6';const s=dh*.44;c.beginPath();c.arc(dl+dw/2,dt+dh*.13+s/2,s/2,0,7);c.fill();
+c.fillStyle=BG0;c.beginPath();c.moveTo(dl+dw/2-s*.16,dt+dh*.13+s*.3);c.lineTo(dl+dw/2+s*.22,dt+dh*.13+s*.5);c.lineTo(dl+dw/2-s*.16,dt+dh*.13+s*.7);c.closePath();c.fill();
+c.fillStyle=TEXT;c.font=`600 ${Math.round(dh*.12)}px Rajdhani`;c.textAlign='center';c.fillText('STREAMBOX',dl+dw/2,dt+dh*.83);c.textAlign='left';
+cut(dl,dt,dl+dw,dt+dh,dh*.13,dh*.035);c.strokeStyle=rgba(A,.6);c.lineWidth=2;c.stroke();
+
+// panel
+const rows=[['MOVE LEFT',''],['MOVE RIGHT',''],['PIN TO DOCK',''],['HIDE',''],['CHANGE ICON','>'],['APP INFO',''],['UNINSTALL','']];
+const typed=[99,99,99,3,2,0,0];   // rows overlap: 3 done, two typing (block cursor), two waiting
+const px=dl+dw+40,pw=760,headH=96,rowH=64,footH=62,ph=headH+rows.length*rowH+footH,py=540-ph/2;
+cut(px,py,px+pw,py+ph,34,10);c.fillStyle=rgba(PANEL,.97);c.fill();c.strokeStyle=rgba(A,.65);c.lineWidth=2;c.stroke();
+// tether and brackets
+c.strokeStyle=rgba(A,.6);c.beginPath();c.moveTo(dl+dw,540);c.lineTo(px,540);c.stroke();c.fillStyle=A;c.fillRect(px-4,536,8,8);
+c.strokeStyle=A;c.lineWidth=2.5;const L=px-8,T=py-8,R=px+pw+8,Bm=py+ph+8,a=22;
+[[L,T,1,1],[R,T,-1,1],[L,Bm,1,-1],[R,Bm,-1,-1]].forEach(([x,y,sx,sy])=>{c.beginPath();c.moveTo(x+a*sx,y);c.lineTo(x,y);c.lineTo(x,y+a*sy);c.stroke();});
+// header
+const x0=px+44,x1=px+pw-44,hy=py+62;
+c.font='700 29px Orbitron';c.fillStyle=A;c.fillText('//',x0,hy);const sl=c.measureText('// ').width;c.fillStyle=TEXT;c.fillText('STREAMBOX',x0+sl,hy);
+c.font='400 17px ShareTech';c.fillStyle=DIM;const bk='BACK TO CLOSE';c.fillText(bk,x1-c.measureText(bk).width,hy-4);
+c.strokeStyle=rgba(DIM,.3);c.lineWidth=1;c.beginPath();c.moveTo(x0,py+headH-14);c.lineTo(x1,py+headH-14);c.stroke();
+// rows
+rows.forEach(([lab,mark],i)=>{const top=py+headH+i*rowH,l=px+28,r=px+pw-28,tt=top+6,bb=top+rowH-6,cy=(tt+bb)/2;
+  const f=i===0;c.font='600 31px Rajdhani';const k=Math.min(lab.length,typed[i]),shown=lab.slice(0,k);
+  c.fillStyle=lab==='UNINSTALL'?DANGER:(f?TEXT:rgba(TEXT,.74));c.fillText(shown,l+20,cy+11);
+  if(k>0&&k<lab.length){const w=c.measureText(shown).width;c.fillStyle=A;c.fillRect(l+20+w+2,cy+11-22,15,25);}
+  if(k===lab.length){c.font='700 25px ShareTech';c.fillStyle=A;const m=mark||(f?'[ OK ]':'');if(m)c.fillText(m,r-20-c.measureText(m).width,cy+9);}
+  if(i<rows.length-1){c.strokeStyle=rgba(DIM,.3);c.beginPath();c.moveTo(l,bb+6);c.lineTo(r,bb+6);c.stroke();}
+  if(f){c.strokeStyle=A;c.lineWidth=2.5;const b=16;[[l,tt,1,1],[r,tt,-1,1],[l,bb,1,-1],[r,bb,-1,-1]].forEach(([x,y,sx,sy])=>{c.beginPath();c.moveTo(x+b*sx,y);c.lineTo(x,y);c.lineTo(x,y+b*sy);c.stroke();});c.lineWidth=1;}
+});
+c.font='400 17px ShareTech';c.fillStyle=DIM;c.fillText('UP DOWN  SELECT    LEFT RIGHT  CHANGE    OK  APPLY',x0,py+ph-28);
+// annotation
+c.font='400 20px ShareTech';c.fillStyle=rgba(TEXT,.8);
+c.fillText('ICON DOCKED, PANEL OUT, ROWS TYPE IN 70 MS APART AND OVERLAP',px,py+ph+60);
+}
+</script>
+</body></html>

@@ -1,0 +1,50 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Deck 2.9 tutorial design mock</title>
+<style>
+  @font-face{font-family:"Orbitron";font-weight:700;src:url(../../assets/fonts/orbitron-bold.ttf)}
+  @font-face{font-family:"OrbitronM";font-weight:500;src:url(../../assets/fonts/orbitron-medium.ttf)}
+  @font-face{font-family:"Rajdhani";font-weight:600;src:url(../../assets/fonts/rajdhani-semibold-latin.ttf)}
+  @font-face{font-family:"ShareTech";font-weight:400;src:url(../../assets/fonts/share-tech-mono.ttf)}
+  html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#07040D}
+  canvas{position:absolute;left:0;top:0}
+</style></head>
+<body><canvas id="c" width="1920" height="1080"></canvas>
+<script src="mock27.js"></script>
+<script>
+// Same layout numbers as TutorialView and ComboLearnView (TestScreen, design pixels). ?p=lesson | try | combo
+const page=(new URLSearchParams(location.search)).get('p')||'lesson';
+fonts(function(){
+c.fillStyle=BG0;c.fillRect(0,0,1920,1080);c.strokeStyle=rgba(TEXT,.04);c.lineWidth=1;
+for(let x=0;x<=1920;x+=80){c.beginPath();c.moveTo(x,0);c.lineTo(x,1080);c.stroke();}for(let y=0;y<=1080;y+=80){c.beginPath();c.moveTo(0,y);c.lineTo(1920,y);c.stroke();}
+function chips(labels){let x=1824;const ws=labels.map(l=>c.measureText(l).width+50);c.font='600 26px Rajdhani';
+  for(let i=labels.length-1;i>=0;i--){const w=Math.max(130,c.measureText(labels[i]).width+60);cut(x-w,64,x,116,12,4);c.fillStyle=rgba(PANEL,.95);c.fill();c.strokeStyle=rgba(DIM,.7);c.lineWidth=2;c.stroke();c.fillStyle=TEXT;c.fillText(labels[i],x-w/2-c.measureText(labels[i]).width/2,100);x-=w+16;}}
+c.font='600 26px Rajdhani';
+if(page==='combo'){
+  c.font='700 44px Orbitron';c.fillStyle=A;c.fillText('MAKE A COMBO',96,120);
+  c.font='400 36px ShareTech';c.fillStyle=TEXT;c.fillText('HOLD ONE BUTTON, THEN PRESS ANOTHER',96,240);c.fillText('WHILE YOU STILL HOLD THE FIRST.',96,290);
+  c.font='400 28px ShareTech';c.fillStyle=DIM;c.fillText('THE FIRST BUTTON STILL GOES TO THE APP. ONLY THE SECOND ONE IS TAKEN.',96,360);
+  c.fillText('USABLE: X, Y, L1, R1, L2, R2, THE STICK CLICKS, CREATE, OPTIONS',96,400);c.fillText('AND SPARE REMOTE BUTTONS.',96,440);
+  c.font='700 60px Orbitron';c.fillStyle=A;c.fillText('HOLDING L1. NOW PRESS THE SECOND BUTTON.',96,620);
+  chips(['CANCEL']);
+}else{
+  // TutorialView numbers (2.10): body 40, line 60, title 84, try box 730..890, strip 912, hint 972
+  const long=page==='long';
+  c.font='700 44px Orbitron';c.fillStyle=A;c.fillText('// TUTORIAL',96,110);
+  c.font='400 28px ShareTech';c.fillStyle=DIM;c.fillText(long?'8 OF 12':(page==='try'?'7 OF 12   //   ABOUT A GAME CONTROLLER':'6 OF 12'),96,158);
+  c.font='700 84px Orbitron';c.fillStyle=TEXT;c.fillText(long?'IF SOMETHING GOES WRONG':(page==='try'?'COMBOS':'REMAPPING BUTTONS'),96,268);
+  const L=long?['DO NOT TRY THESE NOW. THEY ARE FOR WHEN SOMETHING GOES WRONG.','HOLD BACK FOR 6 SECONDS. IT CLEARS THE D-PAD, OK AND BACK REMAPS.','HOLD THE PS BUTTON FOR 4 SECONDS IN AN APP. THE APP KEEPS IT.','HOLD START AND SELECT FOR 2 SECONDS TO LEAVE THE CONTROLLER TESTS.','SETUP, REMAP, RESET ALL REMAPS CLEARS EVERY REMAP. PRESS OK TWICE.','PICTURE LOOKS WRONG? USE RESTORE DISPLAY IN SETUP OR THE PS MENU.','FROM A PHONE: ADB SHELL WM SIZE RESET, THEN WM DENSITY RESET.','OR SEND DECK_CMD RESTORE_DISPLAY TO DECK. SEE DOCS/GAME-PROFILES.MD.']
+   :page==='try'?['A COMBO USES TWO CONTROLLER BUTTONS TOGETHER.','HOLD THE FIRST BUTTON, THEN PRESS THE SECOND.','THE FIRST BUTTON STILL GOES TO THE APP. ONLY THE SECOND IS TAKEN.','MAKE ONE IN SETUP, REMAP, COMBOS.','ALLOWED: X, Y, L1, R1, L2, R2, THE STICK CLICKS, CREATE, OPTIONS.','COMBOS FOLLOW REMAP IN GAMES, SO GAMES KEEP THEIR BUTTONS.']
+   :['IN SETUP, REMAP, THE SPARE REMOTE BUTTONS CAN RUN ACTIONS.','PICK A BUTTON, THEN SET A SHORT PRESS AND A LONG PRESS ACTION.','LEARN A BUTTON FINDS ANY BUTTON, EVEN ONES DECK DOES NOT KNOW.','A REMAP RUNS AN ACTION. IT NEVER PRESSES ANOTHER BUTTON.','A REMAPPED BUTTON STOPS DOING ITS OLD JOB.','IN OTHER APPS IT NEEDS THE OVERLAY SERVICE.'];
+  const hasTry=page==='try',top=350,bottom=hasTry?700:880,lineH=Math.min(60,(bottom-top)/L.length),sc=Math.min(1,lineH/(60*.86));
+  c.font='400 '+(40*sc)+'px ShareTech';c.fillStyle=TEXT;L.forEach((s,i)=>c.fillText(s,96,top+40*sc+i*lineH));
+  if(hasTry){cut(96,730,1824,890,18,6);c.fillStyle=rgba(A,.22);c.fill();c.strokeStyle=A;c.lineWidth=2;c.stroke();
+    c.font='400 28px ShareTech';c.fillStyle=A;c.fillText('TRY IT   //   DONE',128,782);c.font='600 54px Rajdhani';c.fillStyle=TEXT;c.fillText('GOOD. THAT IS A COMBO.',128,852);}
+  const n=12,sw=1728/n;for(let i=0;i<n;i++){const cur=i===(long?7:(page==='try'?6:5));c.fillStyle=cur?A:(i<(long?7:(page==='try'?6:5))?rgba(A,.45):rgba(DIM,.3));c.fillRect(96+i*sw,912,sw-10,cur?16:10);}
+  c.font='400 26px ShareTech';c.fillStyle=DIM;c.fillText('A OR OK NEXT   LEFT RIGHT OR LB RB CHANGE PAGE   BACK OR EXIT LEAVES',96,972);
+  // the base class hint line (TestScreen.drawNavHint), 18 px at y 1022
+  c.font='400 18px ShareTech';c.fillStyle=DIM;c.fillText('TOP BUTTONS: PUSH THE RIGHT STICK UP (OR UP ON THE REMOTE)',960-c.measureText('TOP BUTTONS: PUSH THE RIGHT STICK UP (OR UP ON THE REMOTE)').width/2,1022);
+  chips(['PREVIOUS','NEXT','EXIT']);
+}
+tag('DESIGN MOCK (TUTORIAL AND COMBO SCREENS, EXAMPLE TEXT), NOT A SCREENSHOT OF THE APK');
+});
+</script></body></html>

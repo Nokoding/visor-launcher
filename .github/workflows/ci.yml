@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Get the org.json jar the tests use
+        run: curl -fsSL -o "$RUNNER_TEMP/json.jar" https://repo1.maven.org/maven2/org/json/json/20231013/json-20231013.jar
+      - name: Logic tests
+        run: bash deck/tools/test.sh "$RUNNER_TEMP/json.jar"
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Android SDK
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/cmdline.zip" https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip
+          mkdir -p "$HOME/sdk/cmdline-tools"
+          unzip -q "$RUNNER_TEMP/cmdline.zip" -d "$HOME/sdk/cmdline-tools"
+          mv "$HOME/sdk/cmdline-tools/cmdline-tools" "$HOME/sdk/cmdline-tools/latest"
+          yes | "$HOME/sdk/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$HOME/sdk" "platforms;android-34" "build-tools;34.0.0" > /dev/null
+      - name: Build with a throwaway key
+        run: |
+          keytool -genkeypair -keystore "$RUNNER_TEMP/ci.keystore" -alias ci -keyalg RSA -keysize 2048 -validity 2 -dname "CN=ci" -storepass cipass1234 -keypass cipass1234
+          echo cipass1234 > "$RUNNER_TEMP/pw.txt"
+          bash deck/tools/build.sh "$HOME/sdk" "$RUNNER_TEMP/ci.keystore" "$RUNNER_TEMP/pw.txt" "$RUNNER_TEMP/visor-ci.apk"
+      - name: Check the APK
+        run: |
+          BT="$HOME/sdk/build-tools/34.0.0"
+          "$BT/aapt2" dump badging "$RUNNER_TEMP/visor-ci.apk" | grep "^package"
+          if "$BT/aapt2" dump badging "$RUNNER_TEMP/visor-ci.apk" | grep -q "android.permission.INTERNET"; then echo "INTERNET permission found"; exit 1; fi

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 2.7 Deck's screensaver (DeckDream). The metadata root must be a <dream> tag. No settingsActivity:
+     Deck's options live in Setup, LOOK, SCREENSAVER. -->
+<dream xmlns:android="http://schemas.android.com/apk/res/android" />

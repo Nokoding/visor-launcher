@@ -1,0 +1,26 @@
+Visor Launcher
+Copyright (c) 2026 Nokoding
+
+What is under which licence
+---------------------------
+- The code (deck/, the scripts in deck/tools, the site code in site/, the workflows): MIT, see LICENSE.
+- The documentation (docs/, the README and the other .md files) and the images, logo and brand files
+  (docs/brand, docs/images, site/img): Creative Commons Attribution 4.0 International (CC BY 4.0),
+  https://creativecommons.org/licenses/by/4.0/ . Share and adapt them, and say where they came from.
+- The fonts keep their own licence, the SIL Open Font License 1.1. The licence texts are in docs/licenses.
+    Orbitron          (The League of Moveable Type)
+    Rajdhani          (Indian Type Foundry)
+    Share Tech Mono   (Carrois Apostrophe)
+  The fonts are in deck/assets/fonts and in site/fonts.
+- three.js, if vendored in site/vendor, is MIT, see the header of that file.
+
+Trademarks
+----------
+Visor Launcher is not affiliated with or endorsed by Google, Sony, Microsoft, Valve or any maker of a
+controller, TV or box. Android, Android TV, Google TV, PlayStation, DualSense, Xbox and Steam Deck are
+trademarks of their owners. They are used here as plain text names only, to say what Visor works with.
+Visor is not related to the Steam Deck, to the Valve handheld, or to any hardware or software that is
+also called Visor.
+
+No logos, icons or artwork of anyone else are in this project. The controller outlines and 3D models
+are drawn by the project (hand-written curves and low-poly shapes), not copied from any maker or website.

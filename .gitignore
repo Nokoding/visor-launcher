@@ -1,0 +1,16 @@
+# Signing keys and passwords must never be committed
+*.keystore
+*.jks
+*password*.txt
+*.pem
+
+# Build output and local tooling
+build/
+out/
+sdk/
+sdk-dl/
+dl/
+*.apk
+!releases/*.apk
+*.class
+*.dex

@@ -1,0 +1,85 @@
+name: Release
+
+# Builds the APK, signs it with the key in the repository secrets and publishes a GitHub prerelease.
+# Secrets needed (Settings, Secrets and variables, Actions): DECK_KEYSTORE_B64 and DECK_KS_PASS.
+# Optional variable: EXPECTED_CERT_SHA256. See CONTRIBUTING.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag, for example v2.18-beta"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Check the signing secrets exist
+        env:
+          KS: ${{ secrets.DECK_KEYSTORE_B64 }}
+          PW: ${{ secrets.DECK_KS_PASS }}
+        run: |
+          if [ -z "$KS" ] || [ -z "$PW" ]; then
+            echo "The secrets DECK_KEYSTORE_B64 and DECK_KS_PASS are not set. See CONTRIBUTING.md, Releases and signing."
+            exit 1
+          fi
+      - name: Tests
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/json.jar" https://repo1.maven.org/maven2/org/json/json/20231013/json-20231013.jar
+          bash deck/tools/test.sh "$RUNNER_TEMP/json.jar"
+      - name: Android SDK
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/cmdline.zip" https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip
+          mkdir -p "$HOME/sdk/cmdline-tools"
+          unzip -q "$RUNNER_TEMP/cmdline.zip" -d "$HOME/sdk/cmdline-tools"
+          mv "$HOME/sdk/cmdline-tools/cmdline-tools" "$HOME/sdk/cmdline-tools/latest"
+          yes | "$HOME/sdk/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$HOME/sdk" "platforms;android-34" "build-tools;34.0.0" > /dev/null
+      - name: Build and sign
+        env:
+          KS: ${{ secrets.DECK_KEYSTORE_B64 }}
+          PW: ${{ secrets.DECK_KS_PASS }}
+          EXPECTED: ${{ vars.EXPECTED_CERT_SHA256 }}
+        run: |
+          set -euo pipefail
+          printf '%s' "$KS" | base64 -d > "$RUNNER_TEMP/release.keystore"
+          printf '%s' "$PW" > "$RUNNER_TEMP/pw.txt"
+          bash deck/tools/build.sh "$HOME/sdk" "$RUNNER_TEMP/release.keystore" "$RUNNER_TEMP/pw.txt" "visor-launcher-${{ inputs.tag }}.apk"
+          BT="$HOME/sdk/build-tools/34.0.0"
+          "$BT/aapt2" dump badging "visor-launcher-${{ inputs.tag }}.apk" | grep "^package"
+          if "$BT/aapt2" dump badging "visor-launcher-${{ inputs.tag }}.apk" | grep -q "android.permission.INTERNET"; then echo "INTERNET permission found"; exit 1; fi
+          CERT="$("$BT/apksigner" verify --print-certs "visor-launcher-${{ inputs.tag }}.apk" | sed -n 's/.*certificate SHA-256 digest: //p' | head -1)"
+          echo "Signing certificate SHA-256: $CERT"
+          if [ -n "${EXPECTED:-}" ] && [ "$CERT" != "$EXPECTED" ]; then echo "The certificate does not match EXPECTED_CERT_SHA256"; exit 1; fi
+          sha256sum "visor-launcher-${{ inputs.tag }}.apk" | tee SHA256SUMS.txt
+          echo "CERT=$CERT" >> "$GITHUB_ENV"
+          rm -f "$RUNNER_TEMP/release.keystore" "$RUNNER_TEMP/pw.txt"
+      - name: Publish the prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          APK="visor-launcher-${{ inputs.tag }}.apk"
+          SUM="$(sha256sum "$APK" | cut -d' ' -f1)"
+          cat > notes.md <<NOTES
+          Visor Launcher ${{ inputs.tag }}, public beta. Most features were built without access to every TV: read KNOWN-ISSUES.md before you rely on it.
+
+          SHA-256 of $APK:
+
+              $SUM
+
+          Signing certificate SHA-256: $CERT
+
+          Check it: on a computer run sha256sum $APK, on Termux run sha256sum $APK, on Windows run certutil -hashfile $APK SHA256. The result must match the line above.
+
+          Install: adb install -r $APK  (see docs/guide-laptop.md or docs/guide-termux.md)
+          NOTES
+          gh release create "${{ inputs.tag }}" "$APK" SHA256SUMS.txt --prerelease --title "Visor Launcher ${{ inputs.tag }} (public beta)" --notes-file notes.md

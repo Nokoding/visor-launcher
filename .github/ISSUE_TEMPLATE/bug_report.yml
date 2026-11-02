@@ -1,0 +1,30 @@
+name: Bug report
+description: Something does not work
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: TV or box, and Android version
+      placeholder: "onn. Full HD Streaming Device, Android 14"
+    validations:
+      required: true
+  - type: input
+    id: controller
+    attributes:
+      label: Controller (if it matters)
+      placeholder: "DualSense over Bluetooth"
+  - type: input
+    id: version
+    attributes:
+      label: Visor version (Setup, SYSTEM, VERSION)
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to repeat it

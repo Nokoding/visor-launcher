@@ -1,0 +1,45 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Deck 2.6 LEARN A BUTTON design mock</title>
+<style>
+  @font-face{font-family:"Orbitron";font-weight:700;src:url(../../assets/fonts/orbitron-bold.ttf)}
+  @font-face{font-family:"OrbitronM";font-weight:500;src:url(../../assets/fonts/orbitron-medium.ttf)}
+  @font-face{font-family:"Rajdhani";font-weight:600;src:url(../../assets/fonts/rajdhani-semibold-latin.ttf)}
+  @font-face{font-family:"ShareTech";font-weight:400;src:url(../../assets/fonts/share-tech-mono.ttf)}
+  html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#07040D}
+  canvas{position:absolute;left:0;top:0}
+  #mocktag{position:absolute;left:0;top:1032px;width:1920px;text-align:center;font:400 26px "ShareTech",monospace;color:#07040D}
+  #mocktag span{background:#FFE14D;padding:6px 22px;border:3px solid #07040D;outline:2px solid #FFE14D}
+</style></head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<div id="mocktag"><span>DESIGN MOCK (2.6 LEARN A BUTTON, EXAMPLE VALUES, NOT FROM A REAL REMOTE), NOT A SCREENSHOT OF THE APK</span></div>
+<script>
+// Same layout numbers as RemapLearnView.content() (design px, 1920 x 1080, SYNTHWAVE theme).
+// Every value shown is an example. Which codes the onn remote really sends is not known until it is tried on the box.
+const A='#FF2E97', B='#A855F7', TEXT='#F4EEFF', DIM='#A99DC6', PANEL='#120A21', BG0='#07040D', BG1='#170A2C';
+const c = document.getElementById('c').getContext('2d');
+Promise.all(['700 44px Orbitron','600 26px Rajdhani','400 22px ShareTech','700 64px Orbitron','500 16px OrbitronM'].map(f=>document.fonts.load(f))).then(draw, draw);
+function draw(){
+function rgba(hex,a){const n=parseInt(hex.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;}
+function cut(l,t,r,b,big,small){const m=Math.min(r-l,b-t)*0.45;big=Math.min(big,m);small=Math.min(small,m);
+  c.beginPath();c.moveTo(l+big,t);c.lineTo(r-small,t);c.lineTo(r,t+small);c.lineTo(r,b-big);c.lineTo(r-big,b);c.lineTo(l+small,b);c.lineTo(l,b-small);c.lineTo(l,t+big);c.closePath();}
+c.fillStyle=BG0;c.fillRect(0,0,1920,1080);
+c.strokeStyle=rgba(TEXT,.04);c.lineWidth=1;for(let x=0;x<=1920;x+=80){c.beginPath();c.moveTo(x,0);c.lineTo(x,1080);c.stroke();}for(let y=0;y<=1080;y+=80){c.beginPath();c.moveTo(0,y);c.lineTo(1920,y);c.stroke();}
+// chips, top right (CLEAR, ASSIGN AN ACTION, EXIT), right aligned from x=1824
+const chips=[['CLEAR',150],['ASSIGN AN ACTION',330],['EXIT',120]];let x=1824;
+for(let i=chips.length-1;i>=0;i--){const [n,w]=chips[i];cut(x-w,64,x,116,12,4);c.fillStyle=rgba(PANEL,.95);c.fill();c.strokeStyle=i===1?TEXT:rgba(DIM,.7);c.lineWidth=i===1?4:2;c.stroke();
+  c.font='600 26px Rajdhani';c.fillStyle=TEXT;c.fillText(n,x-w/2-c.measureText(n).width/2,99);x-=w+16;}
+c.font='700 44px Orbitron';c.fillStyle=TEXT;c.fillText('LEARN A BUTTON',96,112);
+c.font='400 18px ShareTech';c.fillStyle=DIM;c.fillText('PRESS ANY BUTTON ON YOUR REMOTE. BACK EXITS. THE D-PAD AND OK STEER THE TOP BUTTONS.',96,160);
+c.font='700 64px Orbitron';c.fillStyle=A;c.fillText('TV BUTTON',96,290);
+function row(y,k,v){c.font='400 18px ShareTech';c.fillStyle=DIM;c.fillText(k,96,y);c.font='400 22px ShareTech';c.fillStyle=TEXT;c.fillText(v,400,y);}
+row(360,'KEY CODE','170');row(410,'SCAN CODE','0');row(460,'DEVICE','EXAMPLE REMOTE  (4012:9001)');row(510,'SOURCE','0x301 KEYBOARD DPAD');row(560,'ID','kc:170');
+function flag(y,k,v,on){c.font='600 26px Rajdhani';c.fillStyle=TEXT;c.fillText(k,96,y);c.fillStyle=on?A:DIM;c.fillText(v,700,y);}
+flag(650,'SEEN BY DECK','NO',false);flag(710,'SEEN BY THE OVERLAY SERVICE','YES',true);
+c.font='400 22px ShareTech';c.fillStyle=TEXT;
+const v=['ONLY THE SERVICE SAW IT. THE SYSTEM TOOK IT BEFORE DECK. A REMAP SHOULD STILL CATCH IT, BUT THE','SYSTEM MAY ACT ON IT TOO. TRY IT.'];v.forEach((s,i)=>c.fillText(s,96,800+i*34));
+c.font='400 18px ShareTech';c.fillStyle=DIM;
+c.fillText('A BUTTON THAT NEVER SHOWS HERE IS KEPT BY THE BOX. NO APP CAN CATCH IT, SO NO REMAP CAN USE IT.',96,990);
+}
+</script>
+</body></html>

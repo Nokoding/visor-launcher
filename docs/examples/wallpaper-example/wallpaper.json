@@ -1,0 +1,84 @@
+{
+  "format": 1,
+  "name": "Neon Skyline Example",
+  "author": "Visor",
+  "version": "1.0",
+  "type": "layers",
+  "options": [
+    {
+      "key": "mood",
+      "label": "Mood",
+      "type": "CHOICE",
+      "choices": [
+        "Night",
+        "Dusk"
+      ],
+      "default": "Night"
+    },
+    {
+      "key": "glow",
+      "label": "Horizon glow",
+      "type": "FLOAT_RANGE",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "default": 0.6
+    },
+    {
+      "key": "stars",
+      "label": "Stars",
+      "type": "BOOL",
+      "default": true
+    },
+    {
+      "key": "accent",
+      "label": "Glow color",
+      "type": "COLOR",
+      "default": "#FF2E97"
+    },
+    {
+      "key": "depth",
+      "label": "Depth",
+      "type": "INT_RANGE",
+      "min": 50,
+      "max": 150,
+      "step": 10,
+      "default": 100,
+      "unit": "%"
+    }
+  ],
+  "layers": [
+    {
+      "file": "sky_night.png",
+      "parallax": 0.05,
+      "when": "mood=Night"
+    },
+    {
+      "file": "sky_dusk.png",
+      "parallax": 0.05,
+      "when": "mood=Dusk"
+    },
+    {
+      "file": "stars.png",
+      "parallax": 0.1,
+      "opacity": "@stars"
+    },
+    {
+      "file": "glow.png",
+      "parallax": 0.2,
+      "opacity": "@glow",
+      "tint": "@accent",
+      "tintMix": 1.0
+    },
+    {
+      "file": "far.png",
+      "parallax": 0.45,
+      "scale": 1.05
+    },
+    {
+      "file": "near.png",
+      "parallax": 1.1,
+      "scale": 1.12
+    }
+  ]
+}

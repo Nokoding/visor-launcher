@@ -1,0 +1,31 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Deck 2.7 screensaver design mock</title>
+<style>
+  @font-face{font-family:"Orbitron";font-weight:700;src:url(../../assets/fonts/orbitron-bold.ttf)}
+  @font-face{font-family:"OrbitronM";font-weight:500;src:url(../../assets/fonts/orbitron-medium.ttf)}
+  @font-face{font-family:"Rajdhani";font-weight:600;src:url(../../assets/fonts/rajdhani-semibold-latin.ttf)}
+  @font-face{font-family:"ShareTech";font-weight:400;src:url(../../assets/fonts/share-tech-mono.ttf)}
+  html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#07040D}
+  canvas{position:absolute;left:0;top:0}
+</style></head>
+<body><canvas id="c" width="1920" height="1080"></canvas>
+<script src="mock27.js"></script>
+<script>
+fonts(function(){
+sky(); skyline(mix(BG1,B,.22),820,120,260,40,90,0); skyline(mix(BG0,B,.2),980,100,200,60,120,200);
+// DIM 75 percent
+c.fillStyle=rgba(BG0,.75);c.fillRect(0,0,1920,1080);
+// the clock block, drifted away from the center (burn-in protection), with the optional stats line
+const bx=420,by=420;
+c.font='700 190px Orbitron';c.fillStyle=TEXT;c.shadowColor=A;c.shadowBlur=24;c.fillText('21:47',bx,by);c.shadowBlur=0;
+const w=c.measureText('21:47').width;
+c.font='700 70px Orbitron';c.fillStyle=A;c.fillText(':09',bx+w+16,by);
+c.font='600 44px Rajdhani';c.fillStyle=DIM;c.fillText('MONDAY  2 NOVEMBER',bx+6,by+70);
+c.font='400 24px ShareTech';c.fillStyle=rgba(DIM,.8);c.fillText('ETHERNET  1000 MBPS     MEMORY 612 OF 1400 MB',bx+6,by+118);
+c.strokeStyle=rgba(A,.6);c.lineWidth=3;c.beginPath();c.moveTo(bx+6,by+24);c.lineTo(bx+w+6,by+24);c.stroke();
+// drift path hint
+c.setLineDash([6,10]);c.strokeStyle=rgba(TEXT,.35);c.lineWidth=2;c.beginPath();c.moveTo(bx+330,by-90);c.bezierCurveTo(900,150,1300,900,1360,760);c.stroke();c.setLineDash([]);
+c.font='400 20px ShareTech';c.fillStyle=rgba(TEXT,.8);c.fillText('THE CLOCK BLOCK DRIFTS TO A NEW SPOT EVERY MINUTE SO NO PIXEL STAYS LIT.',bx,by+170);
+tag('DESIGN MOCK (2.7 SCREENSAVER, EXAMPLE VALUES), NOT A SCREENSHOT OF THE APK');
+});
+</script></body></html>

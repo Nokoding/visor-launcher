@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="deck_bg">#FF07040D</color>
+    <style name="DeckTheme" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/deck_bg</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowShowWallpaper">false</item>
+        <item name="android:colorAccent">#FFFF2E97</item>
+        <item name="android:colorPrimary">#FF120A21</item>
+        <item name="android:statusBarColor">#FF07040D</item>
+        <item name="android:navigationBarColor">#FF07040D</item>
+    </style>
+</resources>

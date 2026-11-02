@@ -1,0 +1,155 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Deck 2.2 test screens design mock</title>
+<style>
+  @font-face{font-family:"Orbitron";font-weight:700;src:url(../../assets/fonts/orbitron-bold.ttf)}
+  @font-face{font-family:"Rajdhani";font-weight:600;src:url(../../assets/fonts/rajdhani-semibold-latin.ttf)}
+  @font-face{font-family:"ShareTech";font-weight:400;src:url(../../assets/fonts/share-tech-mono.ttf)}
+  html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#07040D}
+  canvas{position:absolute;left:0;top:0}
+  #mocktag{position:absolute;left:0;top:8px;width:1920px;text-align:center;font:400 22px "ShareTech",monospace;color:#07040D}
+  #mocktag span{background:#FFE14D;padding:4px 18px;border:3px solid #07040D;outline:2px solid #FFE14D}
+</style></head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<div id="mocktag"><span id="tagtext"></span></div>
+<script>
+// Same coordinates, outline points and colors as PadTestView.java and GyroTestView.java (SYNTHWAVE theme).
+const VIEW = new URLSearchParams(location.search).get('view') || 'gamepad';
+const A='#FF2E97', B='#A855F7', TEXT='#F4EEFF', DIM='#A99DC6', PANEL='#120A21', BG0='#07040D';
+const c = document.getElementById('c').getContext('2d');
+function rgba(hex,a){const n=parseInt(hex.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;}
+function mix(a,b,t){const x=parseInt(a.slice(1),16),y=parseInt(b.slice(1),16);const m=s=>Math.round(((x>>s)&255)*(1-t)+((y>>s)&255)*t);return `rgb(${m(16)},${m(8)},${m(0)})`;}
+function cut(l,t,r,b,big,small){const mc=Math.min(r-l,b-t)*.45;big=Math.min(big,mc);small=Math.min(small,mc);c.beginPath();
+  c.moveTo(l+big,t);c.lineTo(r-small,t);c.lineTo(r,t+small);c.lineTo(r,b-big);c.lineTo(r-big,b);c.lineTo(l+small,b);c.lineTo(l,b-small);c.lineTo(l,t+big);c.closePath();}
+function font(kind,size){c.font = kind==='head' ? `700 ${size}px Orbitron` : kind==='label' ? `600 ${size}px Rajdhani` : `400 ${size}px ShareTech`;}
+function txt(s,x,y,col,kind,size,align){font(kind,size);c.fillStyle=col;c.textAlign=align||'left';
+  if(kind==='head') c.letterSpacing = (size*0.04)+'px'; else c.letterSpacing='0px'; c.fillText(s,x,y);}
+const PS_HALF=[0,-5.0,3.5,-5.0,5.8,-4.6,7.2,-3.6,7.9,-1.8,8.1,0.5,8.0,3.0,7.5,5.2,6.6,6.6,5.4,7.0,4.4,6.4,3.7,4.6,3.0,3.0,1.5,2.6,0,2.6];
+function outline(h){const n=h.length/2,o=[];for(let i=0;i<n;i++)o.push([h[i*2],h[i*2+1]]);for(let i=n-2;i>=1;i--)o.push([-h[i*2],h[i*2+1]]);return o;}
+function background(){c.fillStyle=BG0;c.fillRect(0,0,1920,1080);c.strokeStyle=rgba(TEXT,.04);c.lineWidth=1;
+  for(let x=0;x<=1920;x+=80){c.beginPath();c.moveTo(x+.5,0);c.lineTo(x+.5,1080);c.stroke();}
+  for(let y=0;y<=1080;y+=80){c.beginPath();c.moveTo(0,y+.5);c.lineTo(1920,y+.5);c.stroke();}}
+function chips(labels,widths,on){let x=1824;const r=[];for(let i=labels.length-1;i>=0;i--){r[i]=[x-widths[i],64,x,116];x-=widths[i]+16;}
+  labels.forEach((l,i)=>{const [L,T,R,Bm]=r[i];cut(L,T,R,Bm,12,4);c.fillStyle=on[i]?rgba(A,.85):rgba(PANEL,.95);c.fill();
+    c.strokeStyle=on[i]?A:rgba(DIM,.7);c.lineWidth=2;c.stroke();txt(l,(L+R)/2,(T+Bm)/2+9,on[i]?BG0:TEXT,'label',26,'center');});}
+
+function gamepad(){
+  document.getElementById('tagtext').textContent='DESIGN MOCK OF THE 2.2 GAMEPAD TEST (FULL MODE, 11 OF 16 PRESSED), NOT A SCREENSHOT OF THE APK';
+  background();
+  txt('GAMEPAD TEST',96,110,A,'head',44);
+  txt('FULL TEST: A BUTTON STAYS LIT ONCE PRESSED. PRESS EVERY REQUIRED BUTTON.',96,152,DIM,'label',26);
+  txt('DETECTED: PLAYSTATION  //  DUALSENSE',96,200,TEXT,'mono',22);
+  txt('DUALSENSE WIRELESS CONTROLLER  //  VENDOR 054C  PRODUCT 0CE6',96,232,DIM,'mono',22);
+  chips(['FULL TEST','QUICK TEST','RESET','EXIT'],[190,200,140,120],[true,false,false,false]);
+  const CX=960,CY=620,CM=50, o=outline(PS_HALF);
+  c.beginPath();o.forEach(([x,z],i)=>{const X=CX+x*CM,Y=CY+z*CM;i?c.lineTo(X,Y):c.moveTo(X,Y);});c.closePath();
+  c.fillStyle=rgba(PANEL,.92);c.fill();c.strokeStyle=rgba(B,.18);c.lineWidth=10;c.stroke();c.strokeStyle=rgba(B,.9);c.lineWidth=2;c.stroke();
+  const lit=new Set(['SOUTH','EAST','NORTH','L1','R1','L2','UP','LEFT','RIGHT','START','L3']), held=new Set(['R2held']);
+  function st(name,opt){const on=lit.has(name);c.fillStyle=on?rgba(A,.9):rgba(BG0,.9);c.strokeStyle=on?A:rgba(opt?DIM:TEXT,opt?.45:.6);c.lineWidth=2;return on;}
+  // d-pad
+  const dpx=-265,dpy=-60;
+  [['UP',0,-58,true],['DOWN',0,58,true],['LEFT',-58,0,false],['RIGHT',58,0,false]].forEach(([n,dx,dy,v])=>{
+    const x=CX+dpx+dx,y=CY+dpy+dy,w=v?24:30,h=v?30:24,on=st(n);c.fillRect(x-w,y-h,2*w,2*h);c.strokeRect(x-w,y-h,2*w,2*h);
+    c.fillStyle=on?BG0:TEXT;c.beginPath();const s=10;
+    if(n==='UP'){c.moveTo(x,y-s);c.lineTo(x+s,y+s*.6);c.lineTo(x-s,y+s*.6);} else if(n==='DOWN'){c.moveTo(x,y+s);c.lineTo(x+s,y-s*.6);c.lineTo(x-s,y-s*.6);}
+    else if(n==='LEFT'){c.moveTo(x-s,y);c.lineTo(x+s*.6,y-s);c.lineTo(x+s*.6,y+s);} else {c.moveTo(x+s,y);c.lineTo(x-s*.6,y-s);c.lineTo(x-s*.6,y+s);}
+    c.closePath();c.fill();});
+  // face buttons with PlayStation shapes
+  [['NORTH',0,-66],['SOUTH',0,66],['WEST',-66,0],['EAST',66,0]].forEach(([n,dx,dy])=>{
+    const x=CX+265+dx,y=CY-60+dy,on=st(n);c.beginPath();c.arc(x,y,34,0,7);c.fill();c.stroke();
+    c.strokeStyle=on?BG0:rgba(TEXT,.8);c.lineWidth=3;c.beginPath();c.arc(x,y,26,0,7);c.stroke();const s=26*.46;c.beginPath();
+    if(n==='SOUTH'){c.moveTo(x-s,y-s);c.lineTo(x+s,y+s);c.moveTo(x-s,y+s);c.lineTo(x+s,y-s);} else if(n==='EAST'){c.arc(x,y,s,0,7);}
+    else if(n==='WEST'){c.rect(x-s*.85,y-s*.85,s*1.7,s*1.7);} else {c.moveTo(x,y-s);c.lineTo(x+s,y+s*.75);c.lineTo(x-s,y+s*.75);c.closePath();}
+    c.stroke();c.lineWidth=2;});
+  // shoulders and triggers
+  [['L1',-300,-282,'L1'],['R1',300,-282,'R1']].forEach(([n,dx,dy,l])=>{const x=CX+dx,y=CY+dy,on=st(n);cut(x-90,y-20,x+90,y+20,10,4);c.fill();c.stroke();txt(l,x,y+9,on?BG0:TEXT,'label',26,'center');});
+  [['L2',-300,-342,1.0],['R2',300,-342,0.42]].forEach(([n,dx,dy,v])=>{const x=CX+dx,y=CY+dy,on=st(n);cut(x-90,y-22,x+90,y+22,10,4);c.fill();
+    if(!on){c.fillStyle=rgba(B,.55);c.fillRect(x-86,y-18,172*v,36);} cut(x-90,y-22,x+90,y+22,10,4);c.stroke();txt(n,x,y+9,on?BG0:TEXT,'label',26,'center');});
+  // sticks
+  [['L3',-130,90,-0.62,0.31],['R3',130,90,0.0,-0.88]].forEach(([n,dx,dy,sx,sy])=>{const x=CX+dx,y=CY+dy,on=st(n);c.beginPath();c.arc(x,y,58,0,7);c.fill();c.stroke();
+    c.strokeStyle=rgba(DIM,.4);c.beginPath();c.arc(x,y,40,0,7);c.stroke();c.fillStyle=on?BG0:A;c.beginPath();c.arc(x+sx*40,y+sy*40,14,0,7);c.fill();
+    txt(n,x,y-68,on?A:DIM,'label',26,'center');});
+  // create, options, ps, touchpad
+  [['SELECT',-200,-175,'CREATE'],['START',200,-175,'OPTIONS']].forEach(([n,dx,dy,l])=>{const x=CX+dx,y=CY+dy,on=st(n);c.beginPath();c.roundRect(x-46,y-16,92,32,16);c.fill();c.stroke();txt(l,x,y+6,on?BG0:TEXT,'mono',18,'center');});
+  {const x=CX,y=CY+40;st('HOME',true);c.beginPath();c.arc(x,y,26,0,7);c.fill();c.stroke();txt('PS',x,y+6,DIM,'mono',18,'center');}
+  {const x=CX,y=CY-140;st('TOUCHPAD',true);cut(x-135,y-62,x+135,y+62,14,6);c.fill();c.stroke();txt('TOUCHPAD',x,y+9,DIM,'label',26,'center');}
+  // sidebar
+  let x=1460,y=330;txt('REQUIRED BUTTONS',x,y,DIM,'label',26);txt('11/16',x,y+74,TEXT,'head',64);y+=130;
+  txt('OPTIONAL (NOT COUNTED)',x,y,DIM,'label',26);y+=36;txt('PS  NOT SEEN',x,y,DIM,'mono',22);y+=32;txt('TOUCHPAD  NOT SEEN',x,y,DIM,'mono',22);y+=60;
+  txt('TRIGGERS',x,y,DIM,'label',26);y+=34;
+  [['L2',1.0],['R2',0.42]].forEach(([n,v])=>{txt(n,x,y,TEXT,'mono',22);c.fillStyle=rgba(DIM,.25);c.fillRect(x+70,y-16,230,14);c.fillStyle=A;c.fillRect(x+70,y-16,230*v,14);txt('+'+v.toFixed(2),x+312,y,TEXT,'mono',22);y+=32;});
+  y+=28;txt('STICKS (SHOWN, NOT REQUIRED)',x,y,DIM,'label',26);y+=34;txt('L  X-0.62  Y+0.31',x,y,TEXT,'mono',22);y+=32;txt('R  X 0.00  Y-0.88',x,y,TEXT,'mono',22);
+  txt('OTHER KEYS SEEN',96,330,DIM,'label',26);txt('BUTTON_C (98)',96,366,TEXT,'mono',22);
+  txt('STATUS',96,700,DIM,'label',26);txt('PRESS THE DARK BUTTONS',96,736,TEXT,'mono',22);
+  txt('EXIT: BACK ON THE REMOTE  //  HOLD OPTIONS + CREATE FOR 2 S  //  CLICK EXIT  //  REMOTE: LEFT FULL, RIGHT QUICK, OK RESET',960,1046,DIM,'mono',18,'center');
+}
+
+// ---------- gyro test: same model and projection as ControllerModel.java and GyroTestView.java
+function rotX(a){const C=Math.cos(a),S=Math.sin(a);return [1,0,0,0,C,-S,0,S,C];}
+function rotY(a){const C=Math.cos(a),S=Math.sin(a);return [C,0,S,0,1,0,-S,0,C];}
+function rotZ(a){const C=Math.cos(a),S=Math.sin(a);return [C,-S,0,S,C,0,0,0,1];}
+function mul(a,b){const o=[];for(let r=0;r<3;r++)for(let k=0;k<3;k++)o[r*3+k]=a[r*3]*b[k]+a[r*3+1]*b[3+k]+a[r*3+2]*b[6+k];return o;}
+function apply(m,[x,y,z]){return [m[0]*x+m[1]*y+m[2]*z,m[3]*x+m[4]*y+m[5]*z,m[6]*x+m[7]*y+m[8]*z];}
+function buildModel(){const V=[],F=[];const vert=(x,y,z)=>(V.push([x,y,z]),V.length-1);const face=(i,g)=>F.push({i,g});
+  const o=outline(PS_HALF),n=o.length;o.forEach(([x,z])=>vert(x,1.2,z));o.forEach(([x,z])=>vert(x,-1.2,z));
+  const top=[],bot=[];for(let i=0;i<n;i++){top.push(n-1-i);bot.push(n+i);}face(top,0);face(bot,0);
+  for(let i=0;i<n;i++){const j=(i+1)%n;face([i,j,n+j,n+i],0);}
+  const cyl=(cx,cz,r,y0,y1)=>{const b0=V.length;for(let i=0;i<8;i++){const t=Math.PI*2*i/8;vert(cx+Math.cos(t)*r,y0,cz+Math.sin(t)*r);}
+    const t0=V.length;for(let i=0;i<8;i++){const t=Math.PI*2*i/8;vert(cx+Math.cos(t)*r*.85,y1,cz+Math.sin(t)*r*.85);}
+    const cap=[];for(let i=0;i<8;i++)cap.push(t0+7-i);face(cap,1);for(let i=0;i<8;i++){const j=(i+1)%8;face([b0+j,b0+i,t0+i,t0+j],1);}};
+  cyl(-2.6,1.4,.95,1.2,2.2);cyl(2.6,1.4,.95,1.2,2.2);
+  const a=.32,b=1.0,y=1.28,dx=-5.3,dz=-1.6,cr=[-a,-b,a,-b,a,-a,b,-a,b,a,a,a,a,b,-a,b,-a,a,-b,a,-b,-a,-a,-a],cf=[];
+  for(let i=0;i<12;i++)cf[11-i]=vert(dx+cr[i*2],y,dz+cr[i*2+1]);face(cf,1);
+  [[0,-1.05],[1.05,0],[0,1.05],[-1.05,0]].forEach(([px,pz])=>{const cx=5.3+px,cz=-1.6+pz,r=.42;const v0=vert(cx,y,cz-r),v1=vert(cx+r,y,cz),v2=vert(cx,y,cz+r),v3=vert(cx-r,y,cz);face([v3,v2,v1,v0],1);});
+  const ty=1.32;const t0=vert(-2.7,ty,-4.7),t1=vert(2.7,ty,-4.7),t2=vert(2.7,ty,-1.5),t3=vert(-2.7,ty,-1.5);face([t3,t2,t1,t0],1);
+  return {V,F};}
+function newell(P,f){let nx=0,ny=0,nz=0;for(let i=0;i<f.length;i++){const a=P[f[i]],b=P[f[(i+1)%f.length]];nx+=(a[1]-b[1])*(a[2]+b[2]);ny+=(a[2]-b[2])*(a[0]+b[0]);nz+=(a[0]-b[0])*(a[1]+b[1]);}return [nx,ny,nz];}
+function gyro(){
+  document.getElementById('tagtext').textContent='DESIGN MOCK OF THE 2.2 GYRO TEST (TILTED UP AND LEFT, SWAY PREVIEW ON), NOT A SCREENSHOT OF THE APK';
+  background();
+  txt('GYRO TEST',96,110,A,'head',44);
+  txt('TILT AND TURN THE CONTROLLER. A OR X (OK ON THE REMOTE) RECENTERS. Y SWITCHES SWAY PREVIEW.',96,152,DIM,'label',26);
+  txt('LIVE',96,200,TEXT,'mono',22);
+  txt('PLAYSTATION  //  DUALSENSE WIRELESS CONTROLLER  //  VENDOR 054C  PRODUCT 0CE6',96,232,DIM,'mono',22);
+  chips(['RECENTER','SWAY PREVIEW','EXIT'],[170,230,120],[false,true,false]);
+  const pitch=16*Math.PI/180, roll=14*Math.PI/180, yaw=10*Math.PI/180; // up and left
+  const right=-14, up=16;
+  // corners
+  const xs=[200,1240,200,1240], ys=[300,300,940,940], names=['TL','TR','BL','BR'], litC=0;
+  for(let i=0;i<4;i++){const on=i===litC,x=xs[i],y=ys[i],sx=i%2===0?1:-1,sy=i<2?1:-1;c.strokeStyle=on?A:rgba(DIM,.5);c.lineWidth=on?5:2;
+    c.beginPath();c.moveTo(x,y);c.lineTo(x+70*sx,y);c.moveTo(x,y);c.lineTo(x,y+70*sy);c.stroke();
+    if(on){c.fillStyle=rgba(A,.85);const L=x+(sx>0?14:-70),T=y+(sy>0?14:-50);c.fillRect(L,T,56,36);}
+    txt(names[i],x+42*sx,y+(sy>0?42:-22),on?BG0:DIM,'label',26,'center');}
+  // model
+  const M=buildModel(),S=34,DIST=1500,FOC=1500,MX=720,MY=560-70;
+  const R=mul(mul(rotY(yaw),rotX(pitch)),rotZ(roll)), MV=mul(rotX(0.95),R);
+  const T=M.V.map(v=>apply(MV,[v[0]*S,v[1]*S,v[2]*S])), P=T.map(([x,y,z])=>{const k=FOC/(DIST-z);return [MX+x*k,MY-y*k];});
+  const vis=[[],[]];let topVis=false;
+  M.F.forEach((f,idx)=>{let cx=0,cy=0,cz=0;f.i.forEach(k=>{cx+=T[k][0];cy+=T[k][1];cz+=T[k][2];});cx/=f.i.length;cy/=f.i.length;cz/=f.i.length;
+    const n=newell(T,f.i),v=[-cx,-cy,DIST-cz],nl=Math.hypot(...n),vl=Math.hypot(...v);f.facing=(n[0]*v[0]+n[1]*v[1]+n[2]*v[2])/(nl*vl);f.depth=vl;
+    if(idx===0) topVis=f.facing>0.001; if(f.facing>0.001) vis[f.g].push(f);});
+  vis.forEach(l=>l.sort((a,b)=>b.depth-a.depth));
+  const draw=l=>l.forEach(f=>{c.beginPath();f.i.forEach((k,j)=>j?c.lineTo(...P[k]):c.moveTo(...P[k]));c.closePath();const sh=.12+.62*f.facing,deco=f.g===1;
+    c.fillStyle=mix(PANEL,deco?A:B,deco?sh*.8:sh*.55);c.fill();c.strokeStyle=rgba(deco?A:B,.55+.45*f.facing);c.lineWidth=deco?2:1.6;c.stroke();});
+  if(topVis){draw(vis[0]);draw(vis[1]);}else{draw(vis[1]);draw(vis[0]);}
+  // sway preview tile: GyroFilter at rest after a top left tilt: rx and ry negative
+  {const rx=-4.5*Math.PI/180, ry=-4*Math.PI/180, cx=720-3.6, cy=900, w=300, h=168;const pts=[[-w/2,-h/2],[w/2,-h/2],[w/2,h/2],[-w/2,h/2]];
+    c.beginPath();pts.forEach(([px,py],i)=>{const y1=py*Math.cos(rx),z1=-py*Math.sin(rx),x2=px*Math.cos(ry),z2=z1*Math.cos(ry)-px*Math.sin(ry),k=1200/(1200-z2);
+      const X=cx+x2*k,Y=cy+y1*k;i?c.lineTo(X,Y):c.moveTo(X,Y);});c.closePath();c.fillStyle=rgba(PANEL,.95);c.fill();c.strokeStyle=A;c.lineWidth=3;c.stroke();
+    txt('SWAY PREVIEW',cx,cy+9,TEXT,'label',26,'center');txt('DIRECTION FOLLOW  //  STRENGTH 100%',720,cy+h/2+40,DIM,'mono',18,'center');}
+  // readouts
+  let x=1440,y=320;const f=(v,d)=>(Math.abs(v)<Math.pow(10,-d)/2?' ':(v<0?'-':'+'))+Math.abs(v).toFixed(d);
+  txt('ANGLES (DEGREES)',x,y,DIM,'label',26);y+=44;
+  [['PITCH UP  ',up],['ROLL RIGHT',right],['YAW LEFT  ',10]].forEach(([n,v])=>{txt(n+' '+f(v,1),x,y,TEXT,'mono',22);y+=32;});
+  y+=20;txt('GYRO RATES (RAD/S)',x,y,DIM,'label',26);y+=40;[['X',0.12],['Y',0.03],['Z',-0.07]].forEach(([n,v])=>{txt(n+' '+f(v,2),x,y,TEXT,'mono',22);y+=32;});
+  y+=20;txt('ACCEL (M/S2)',x,y,DIM,'label',26);y+=40;txt('-2.3 +9.1 -2.7',x,y,TEXT,'mono',22);
+  // level with trail
+  const lx=1620,ly=880,r=120;c.strokeStyle=rgba(DIM,.5);c.lineWidth=2;[r,r/3,r*2/3].forEach(rr=>{c.beginPath();c.arc(lx,ly,rr,0,7);c.stroke();});
+  c.beginPath();c.moveTo(lx-r,ly);c.lineTo(lx+r,ly);c.moveTo(lx,ly-r);c.lineTo(lx,ly+r);c.stroke();
+  const dx=right/45*r,dy=-up/45*r;for(let i=0;i<40;i++){const t=i/40,a=1-t;c.fillStyle=rgba(B,.5*a);c.beginPath();c.arc(lx+dx*(1-t*1.0)+t*8,ly+dy*(1-t)+t*4,3+5*a,0,7);c.fill();}
+  c.fillStyle=A;c.beginPath();c.arc(lx+dx,ly+dy,14,0,7);c.fill();txt('TILT LEVEL (45 DEG AT THE RIM)',lx,ly-r-22,DIM,'label',26,'center');
+  txt('EXIT: BACK ON THE REMOTE OR B  //  HOLD START + SELECT FOR 2 S  //  CLICK EXIT',960,1046,DIM,'mono',18,'center');
+}
+document.fonts.load('700 20px Orbitron').then(()=>document.fonts.load('600 20px Rajdhani')).then(()=>document.fonts.load('20px ShareTech')).then(()=>{ if(VIEW==='gyro') gyro(); else gamepad(); });
+</script>
+</body></html>

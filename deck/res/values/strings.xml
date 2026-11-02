@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Rename the launcher here. Everything reads this one string. -->
+    <string name="app_name">Visor</string>
+    <string name="safe_title">Visor stopped a few times in a row. Pick what to do.</string>
+    <string name="safe_stock">Open Google TV home</string>
+    <string name="safe_retry">Try Visor again</string>
+    <string name="safe_settings">Open Settings</string>
+    <string name="safe_restart">Restart Visor</string>
+    <string name="safe_reset">Reset Visor and restart</string>
+    <string name="safe_hint">Google TV home is turned off on this box. To turn it back on from your phone, run: adb shell pm enable com.google.android.apps.tv.launcherx</string>
+    <!-- 2.4 PS overlay accessibility service -->
+    <string name="ps_service_label">Visor PS menu</string>
+    <string name="ps_service_summary">Opens the Visor PS menu over any app</string>
+    <string name="ps_service_desc">Lets the PS button on a game controller open Visor\'s quick menu over other apps. It reads key presses only to spot the PS button, and while the menu is open the menu keys. It notes which app is in front only to skip apps you set to keep the PS button. It does not read screen content, except for one job you start yourself: the task manager\'s experimental Force stop, which clicks the buttons on an app\'s App Info page. It stores nothing about the apps you use.</string>
+    <!-- 2.7 Visor's own screensaver (a DreamService) -->
+    <string name="dream_label">Visor screensaver</string>
+</resources>

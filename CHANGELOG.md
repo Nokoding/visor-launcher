@@ -1,0 +1,32 @@
+# Changelog
+
+Visor Launcher was developed privately as "Deck" until this public beta. Versions below are the internal numbers.
+
+## 2.18-beta (public beta)
+
+First public release. The same code as 2.17 plus:
+- Renamed to Visor Launcher on screen and in the docs. The package name and the file names on the TV are unchanged, so an older build updates in place.
+- The controller outlines in the gamepad test are the project's own hand-written curves again (drawing data from a third party is not shipped).
+- New guides, FAQ, logo and website.
+
+## 2.17
+
+- Tutorial can no longer trap you, with a SKIP TRY chip.
+- A game profile can carry its own performance mode and volume. New profiles use the phone helper method.
+- Home can be remapped in ADVANCED REMAP behind a last warning, only if the service sees it. Five quick Home presses give it back.
+- Gamepad test: hold B to leave, SKIP NEXT, a rumble check and a small report.
+- Theme editor with a readability warning, theme files and install scripts.
+- Better 3D controller models and your own OBJ models.
+- Experimental video wallpapers and a phone side upload page.
+
+## 2.16
+
+- Tutorial combo page fix, performance mode shows free memory before and after, EXIT GAME and PERFORMANCE MODE remap actions.
+
+## 2.9 to 2.15
+
+- Tutorial and combos (2.9), stick volume (2.10, 2.11), wheel stick speed up to 500 percent, setup script and adb command doc, performance mode and EXIT GAME (2.12), flat gamepad test with controller outlines (2.12 to 2.14), a fix for the display grant (2.15).
+
+## 2.0 to 2.8
+
+- Wheel and grid home screen, themes, sound packs, icon packs, wallpaper packs, animations, the PS style overlay and control center, task manager, button remap, screensaver, game profiles and touchpad volume.

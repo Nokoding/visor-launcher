@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Deck is a sideloaded home screen, not a Play Store app. Listing every launchable
+         app (Add app, Show all apps) is its core job, so the Play policy check does not apply. -->
+    <issue id="QueryAllPackagesPermission" severity="ignore" />
+</lint>

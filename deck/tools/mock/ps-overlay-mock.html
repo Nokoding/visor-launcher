@@ -1,0 +1,92 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Deck 2.4 PS overlay design mock</title>
+<style>
+  @font-face{font-family:"Orbitron";font-weight:700;src:url(../../assets/fonts/orbitron-bold.ttf)}
+  @font-face{font-family:"Rajdhani";font-weight:600;src:url(../../assets/fonts/rajdhani-semibold-latin.ttf)}
+  @font-face{font-family:"ShareTech";font-weight:400;src:url(../../assets/fonts/share-tech-mono.ttf)}
+  html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#000}
+  canvas{position:absolute;left:0;top:0}
+  #mocktag{position:absolute;left:0;top:1032px;width:1920px;text-align:center;font:400 26px "ShareTech",monospace;color:#07040D}
+  #mocktag span{background:#FFE14D;padding:6px 22px;border:3px solid #07040D;outline:2px solid #FFE14D}
+</style></head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<div id="mocktag"><span>DESIGN MOCK (2.4 PS MENU OVER A PRETEND GAME, MID TYPING), NOT A SCREENSHOT OF THE APK</span></div>
+<script>
+// Same layout numbers as QuickMenu.java (SYNTHWAVE theme, SOLID, TYPE, LEFT TO RIGHT):
+// panel 640 wide, right edge at x 1824, header 104, section labels 34, rows 74, volume row 104, footer 64.
+// The game underneath is made up and drawn in its own colors; the scrim over it is bg0 at 55 percent.
+const A='#FF2E97', B='#A855F7', TEXT='#F4EEFF', DIM='#A99DC6', PANEL='#120A21', BG0='#07040D';
+const c=document.getElementById('c').getContext('2d');
+Promise.all(['700 26px Orbitron','600 30px Rajdhani','400 17px ShareTech'].map(f=>document.fonts.load(f))).then(draw,draw);
+function draw(){
+function rgba(hex,a){const n=parseInt(hex.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;}
+function mix(a,b,t){const x=parseInt(a.slice(1),16),y=parseInt(b.slice(1),16);const m=s=>Math.round(((x>>s)&255)*(1-t)+((y>>s)&255)*t);return `rgb(${m(16)},${m(8)},${m(0)})`;}
+function cut(l,t,r,b,big,small){const m=Math.min(r-l,b-t)*0.45;big=Math.min(big,m);small=Math.min(small,m);
+  c.beginPath();c.moveTo(l+big,t);c.lineTo(r-small,t);c.lineTo(r,t+small);c.lineTo(r,b-big);c.lineTo(r-big,b);c.lineTo(l+small,b);c.lineTo(l,b-small);c.lineTo(l,t+big);c.closePath();}
+
+// ---- the pretend game: a sunset racer with its own HUD
+let g=c.createLinearGradient(0,0,0,560);g.addColorStop(0,'#1B2B6B');g.addColorStop(0.6,'#E8633A');g.addColorStop(1,'#FFC163');
+c.fillStyle=g;c.fillRect(0,0,1920,560);
+c.fillStyle='#FFD86B';c.beginPath();c.arc(960,520,150,Math.PI,0);c.fill();
+c.fillStyle='#3A1F4A';let x=0,s=11;function rnd(){s=(s*1103515245+12345)&0x7fffffff;return s/0x7fffffff;}
+while(x<1920){const w=60+rnd()*140,h=40+rnd()*120;c.beginPath();c.moveTo(x,560);c.lineTo(x+w/2,560-h);c.lineTo(x+w,560);c.fill();x+=w*0.7;}
+g=c.createLinearGradient(0,560,0,1080);g.addColorStop(0,'#2E2E38');g.addColorStop(1,'#14141A');c.fillStyle=g;c.fillRect(0,560,1920,520);
+c.fillStyle='#4CAF50';c.beginPath();c.moveTo(0,560);c.lineTo(860,560);c.lineTo(-400,1080);c.lineTo(0,1080);c.fill();
+c.beginPath();c.moveTo(1920,560);c.lineTo(1060,560);c.lineTo(2320,1080);c.lineTo(1920,1080);c.fill();
+c.strokeStyle='#F5F5F5';c.lineWidth=10;
+for(let i=0;i<7;i++){const t0=i/7,t1=t0+0.06,y0=560+520*t0*t0,y1=560+520*t1*t1;c.lineWidth=4+20*t0;c.beginPath();c.moveTo(960,y0);c.lineTo(960,y1);c.stroke();}
+// car
+c.fillStyle='#D32F2F';c.beginPath();c.moveTo(780,960);c.lineTo(820,860);c.lineTo(1100,860);c.lineTo(1140,960);c.closePath();c.fill();
+c.fillStyle='#263238';c.fillRect(850,875,220,45);c.fillStyle='#111';c.fillRect(770,950,80,50);c.fillRect(1070,950,80,50);
+c.fillStyle='#FFEB3B';c.fillRect(800,925,60,16);c.fillRect(1060,925,60,16);
+// game HUD (the game's own, plain sans)
+c.font='bold 64px sans-serif';c.fillStyle='#FFFFFF';c.fillText('212',90,960);c.font='bold 28px sans-serif';c.fillText('KM/H',220,960);
+c.fillText('LAP 2/3',90,110);c.fillText('POS 3',90,150);c.fillText('01:42.338',1650,110);
+
+// ---- Deck overlay: scrim, then the panel (fully grown), rows mid typing
+c.fillStyle=rgba(BG0,0.55);c.fillRect(0,0,1920,1080);
+const items=[['app','NEONFLIX'],['app','PIXELTUBE'],['app','STREAMBOX'],['app','RETRO RACER'],['vol','VOLUME','12 / 15'],['row','OPEN SETUP'],['row','CLOSE']];
+const typed=[99,99,7,3,0,0,0];          // rows overlap: two done, two typing (block cursor), the rest waiting
+const pw=640,HEAD=104,SEC=34,ROW=74,VROW=104,FOOT=64;
+let ph=HEAD+SEC*2+FOOT;items.forEach(it=>ph+=it[0]==='vol'?VROW:ROW);
+const px=1824-pw,py=Math.max(60,(1080-ph)/2);
+cut(px,py,px+pw,py+ph,30,10);
+g=c.createLinearGradient(0,py,0,py+ph);g.addColorStop(0,mix(PANEL,'#FFFFFF',.04));g.addColorStop(1,BG0);c.globalAlpha=0.97;c.fillStyle=g;c.fill();c.globalAlpha=1;
+c.strokeStyle=rgba(A,.7);c.lineWidth=2;c.stroke();
+const x0=px+40,x1=px+pw-40,hy=py+64;
+c.font='700 26px Orbitron';c.fillStyle=A;c.fillText('//',x0,hy);const sl=c.measureText('// ').width;c.fillStyle=TEXT;c.fillText('QUICK MENU',x0+sl,hy);
+c.font='400 17px ShareTech';c.fillStyle=DIM;const tg='PS BUTTON';c.fillText(tg,x1-c.measureText(tg).width,hy-3);
+c.strokeStyle=rgba(DIM,.3);c.lineWidth=1;c.beginPath();c.moveTo(x0,py+HEAD-16);c.lineTo(x1,py+HEAD-16);c.stroke();
+c.fillStyle=DIM;c.fillText('RECENT APPS',x0,py+HEAD+SEC-10);
+let y=py+HEAD+SEC;const icol=['#E53935','#29B6F6','#7E57C2','#FFB300'];
+items.forEach((it,i)=>{
+  if(it[0]==='vol'){y+=SEC;c.font='400 17px ShareTech';c.fillStyle=DIM;c.fillText('SYSTEM',x0,y-14);}
+  const h=it[0]==='vol'?VROW:ROW,l=px+24,r=px+pw-24,t=y+5,b=y+h-5;
+  const f=i===0;
+  if(f){cut(l,t,r,b,14,4);c.fillStyle=rgba(A,.16);c.fill();c.strokeStyle=A;c.lineWidth=2.5;const a=16;
+    [[l,t,1,1],[r,t,-1,1],[l,b,1,-1],[r,b,-1,-1]].forEach(([xx,yy,sx,sy])=>{c.beginPath();c.moveTo(xx+a*sx,yy);c.lineTo(xx,yy);c.lineTo(xx,yy+a*sy);c.stroke();});c.lineWidth=1;}
+  const lx=l+18;const k=typed[i];
+  const base=(it[0]==='vol'?t+40:(t+b)/2)+10;
+  c.font='600 30px Rajdhani';
+  if(it[0]==='app'){
+    const sz=(b-t)-12,iy=t+6;
+    if(k>0){cut(lx,iy,lx+sz,iy+sz,sz*.18,sz*.05);c.fillStyle=rgba(BG0,.8);c.fill();c.strokeStyle=rgba(A,.5);c.stroke();
+      c.fillStyle=icol[i];c.beginPath();c.arc(lx+sz/2,iy+sz/2,sz*.3,0,7);c.fill();}
+    const tx=lx+sz+18,shown=it[1].slice(0,Math.min(k,it[1].length));
+    c.fillStyle=f?TEXT:rgba(TEXT,.78);c.fillText(shown,tx,base);
+    if(k>0&&k<it[1].length){const w=c.measureText(shown).width;c.fillStyle=A;c.fillRect(tx+w+2,base-22,14,24);}
+  } else if(it[0]==='vol'){
+    // still waiting for its turn: only the empty bar shows faintly
+    const bw=(r-l)-36,seg=bw/20,by=b-32;for(let q=0;q<20;q++){c.fillStyle=rgba(DIM,0.06);c.fillRect(lx+q*seg,by,seg-4,14);}
+  }
+  y+=h;
+});
+c.font='400 17px ShareTech';c.fillStyle=DIM;c.fillText('CROSS SELECT   CIRCLE CLOSE   LEFT RIGHT VOLUME',x0,py+ph-26);
+// annotations
+c.font='400 20px ShareTech';c.fillStyle=rgba(TEXT,.85);
+c.fillText('PS PRESSED IN A GAME THAT IS SET TO DECK: THE GAME KEEPS RUNNING UNDERNEATH,',90,1000-500);
+c.fillText('ITS KEYS AND STICKS GO TO THE MENU UNTIL IT CLOSES. HOLD PS 4 S TO LET GO.',90,1000-470);
+}
+</script>
+</body></html>
