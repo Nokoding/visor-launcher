@@ -40,7 +40,7 @@ The default is all five groups. It never turns off Google TV's launcher unless y
 ```
 bash deck/tools/setup-all.sh TVIP:PORT run --only access,overlay      # just those groups
 bash deck/tools/setup-all.sh TVIP:PORT run --skip home,saver          # everything except those
-bash deck/tools/setup-all.sh TVIP:PORT run --apk visor-launcher-v2.19-beta.apk       # install Visor first, then the steps
+bash deck/tools/setup-all.sh TVIP:PORT run --apk visor-launcher-v2.20-beta.apk       # install Visor first, then the steps
 bash deck/tools/setup-all.sh TVIP:PORT run --saver-minutes 10         # screensaver after 10 idle minutes
 bash deck/tools/setup-all.sh TVIP:PORT run --yes                      # do not ask
 bash deck/tools/setup-all.sh TVIP:PORT status                         # only read, change nothing
@@ -54,7 +54,7 @@ It was tested against a fake adb with good and bad input. The overlay and screen
 ## Install and update
 
 ```
-adb install -r visor-launcher-v2.19-beta.apk
+adb install -r visor-launcher-v2.20-beta.apk
 adb shell am start -n com.nokoding.deck/.HomeActivity
 ```
 

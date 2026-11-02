@@ -67,13 +67,13 @@ If you have an Android 9 or 10 box, plug in USB or use `adb connect TVIP:5555` a
 
 1. Download the newest `visor-launcher-*.apk` from https://github.com/Nokoding/visor-launcher/releases . The beta is marked "Pre-release". The latest-release link on GitHub skips pre-releases, so use this list.
 2. Check the download is the one that was published. The release notes show a SHA-256 line.
-   - Windows: `certutil -hashfile visor-launcher-v2.19-beta.apk SHA256`
-   - macOS: `shasum -a 256 visor-launcher-v2.19-beta.apk`
-   - Linux: `sha256sum visor-launcher-v2.19-beta.apk`
+   - Windows: `certutil -hashfile visor-launcher-v2.20-beta.apk SHA256`
+   - macOS: `shasum -a 256 visor-launcher-v2.20-beta.apk`
+   - Linux: `sha256sum visor-launcher-v2.20-beta.apk`
    The result must match the line in the notes. If it does not, do not install it.
 3. Install and start it:
 ```
-adb install -r visor-launcher-v2.19-beta.apk
+adb install -r visor-launcher-v2.20-beta.apk
 adb shell am start -n com.nokoding.deck/.HomeActivity
 ```
 `install -r` installs or updates and keeps your settings. The app is named Visor Launcher, but its package is still `com.nokoding.deck`, which is why that name appears in the commands.

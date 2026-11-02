@@ -56,7 +56,7 @@ sh_tv() { adb -s "$TARGET" shell "$@" | tr -d '\r'; }
 sh_tv pm path "$PKG" >/dev/null 2>&1 || die "Visor is not installed on the TV"
 VC=$(sh_tv dumpsys package "$PKG" | sed -n 's/.*versionCode=\([0-9]*\).*/\1/p' | head -n 1)
 if [ "$MODE" = on ] && [ -n "$VC" ] && [ "$VC" -lt 11 ]; then
-  die "Visor on the TV is too old (version code $VC). Install visor-launcher-v2.19-beta.apk or newer first."
+  die "Visor on the TV is too old (version code $VC). Install visor-launcher-v2.20-beta.apk or newer first."
 fi
 
 # a setting's value, "" when it is not set
