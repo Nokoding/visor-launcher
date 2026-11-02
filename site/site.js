@@ -100,18 +100,40 @@ async function start() {
     const g = new THREE.Group(); g.add(mesh);
     return { g, geo, m };
   }
+  // Each button's glow is a soft pool of light around the middle of its faces, so it follows the shape instead of showing a hard patch.
+  function buttonSpots(b) {
+    const m = b.m, ix = m.idx, p = m.pos, spots = {};
+    const cen = new Float32Array(m.nt * 3);
+    for (let f = 0; f < m.nt; f++) for (let k = 0; k < 3; k++) cen[f * 3 + k] = (p[ix[f * 3] * 3 + k] + p[ix[f * 3 + 1] * 3 + k] + p[ix[f * 3 + 2] * 3 + k]) / 3;
+    const acc = {};
+    for (let f = 0; f < m.nt; f++) {
+      const id = m.btn[f]; if (id === 255) continue;
+      const a = acc[id] || (acc[id] = { x: 0, y: 0, z: 0, n: 0 });
+      a.x += cen[f * 3]; a.y += cen[f * 3 + 1]; a.z += cen[f * 3 + 2]; a.n++;
+    }
+    for (const id in acc) { const a = acc[id]; spots[id] = { x: a.x / a.n, y: a.y / a.n, z: a.z / a.n, r: 0.6 }; }
+    for (let f = 0; f < m.nt; f++) {
+      const id = m.btn[f]; if (id === 255) continue;
+      const s = spots[id], d = Math.hypot(cen[f * 3] - s.x, cen[f * 3 + 1] - s.y, cen[f * 3 + 2] - s.z);
+      if (d > s.r && d < 2.2) s.r = d;
+    }
+    b.cen = cen; b.spots = spots;
+  }
   function paint(b) {
-    const colA = b.geo.getAttribute('color'), arr = colA.array, nt = b.m.nt, btn = b.m.btn;
+    if (!b.spots) buttonSpots(b);
+    const colA = b.geo.getAttribute('color'), arr = colA.array, nt = b.m.nt, cen = b.cen;
     const base = COL.body, hot = COL.glow;
+    const active = [];
+    const want = id => glowAll || glowSet.has(id) || (id === 4 && glowSet.has(6)) || (id === 5 && glowSet.has(7));
+    for (const id in b.spots) if (want(+id)) active.push(b.spots[id]);
     for (let f = 0; f < nt; f++) {
-      const id = btn[f];
-      let lit = false;
-      if (id !== 255) {
-        // the front corner faces are bumper and trigger together (4,5 and 6,7)
-        lit = glowAll || glowSet.has(id) || (id === 4 && glowSet.has(6)) || (id === 5 && glowSet.has(7));
+      let w = 0;
+      for (let i = 0; i < active.length; i++) {
+        const s = active[i], d = Math.hypot(cen[f * 3] - s.x, cen[f * 3 + 1] - s.y, cen[f * 3 + 2] - s.z), reach = s.r * 1.5 + 0.15;
+        if (d < reach) { const t = 1 - d / reach; const v = t * t * (3 - 2 * t); if (v > w) w = v; }
       }
-      const c = lit ? hot : base, o = f * 9;
-      arr[o] = c.r; arr[o + 1] = c.g; arr[o + 2] = c.b; arr[o + 3] = c.r; arr[o + 4] = c.g; arr[o + 5] = c.b; arr[o + 6] = c.r; arr[o + 7] = c.g; arr[o + 8] = c.b;
+      const r = base.r + (hot.r - base.r) * w, g = base.g + (hot.g - base.g) * w, bl = base.b + (hot.b - base.b) * w, o = f * 9;
+      arr[o] = r; arr[o + 1] = g; arr[o + 2] = bl; arr[o + 3] = r; arr[o + 4] = g; arr[o + 5] = bl; arr[o + 6] = r; arr[o + 7] = g; arr[o + 8] = bl;
     }
     colA.needsUpdate = true;
   }
