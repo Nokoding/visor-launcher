@@ -2,11 +2,7 @@
 
 New in 2.8. A game profile lowers the picture resolution for one heavy app and puts it back when you are done. Setup, SYSTEM, GAME PROFILES.
 
-![A game profile, design mock](img/preview-game-profile.png)
-
-![The keep or revert prompt, design mock](img/preview-keep-revert.png)
-
-Design mocks, not screenshots. Nothing in 2.8 has run on a TV.
+![A game profile with example values. A rendered preview, not a photo.](images/game-profile.webp)
 
 ## Read this first
 

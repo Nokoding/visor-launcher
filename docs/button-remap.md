@@ -2,9 +2,7 @@
 
 New in 2.6. The spare buttons on your remote can run what you want. Channel up and down, TV, input and the account switcher are the ones you asked for, and any other button the remote has (color buttons, guide, info) works the same way. A short press and a long press each get an action: open an app, go Home, take a screenshot, change the volume, open Visor's PS menu and more.
 
-![The REMAP tab, design mock](img/preview-remap.png)
-
-The image is a design mock rendered from deck/tools/mock/remap-mock.html with Panel's layout numbers and example rules. It's not a screenshot.
+![The REMAP tab with example rules. A rendered preview, not a photo.](images/remap.webp)
 
 Inside Visor this works with nothing else turned on. In other apps it needs the same accessibility service as the PS menu (PsService), which you switch on with one adb command from your phone, see [ps-menu.md](ps-menu.md). And it only works for buttons the box really hands to an app. Setup tells you which, see Learn a button below. Visor won't pretend otherwise.
 
@@ -65,7 +63,7 @@ OPEN INPUT PICKER: Android has no public "pick an input" screen to call, and Goo
 
 LEARN A BUTTON, "PRESS A BUTTON ON YOUR REMOTE". It works with any button, including ones this version has never heard of.
 
-![Learn a button, design mock](img/preview-remap-learn.png)
+![The learn a button screen. A rendered preview, not a photo.](images/remap-learn.webp)
 
 It shows the button's name, key code, scan code, the device's name with vendor and product id, the source, and an id (the name Visor saves the rule under). Then two flags:
 

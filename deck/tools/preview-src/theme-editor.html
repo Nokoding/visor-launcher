@@ -1,5 +1,5 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><title>Deck 2.7 LOOK tab design mock</title>
+<html><head><meta charset="utf-8"><title>Visor preview source</title>
 <style>
   @font-face{font-family:"Orbitron";font-weight:700;src:url(../../assets/fonts/orbitron-bold.ttf)}
   @font-face{font-family:"OrbitronM";font-weight:500;src:url(../../assets/fonts/orbitron-medium.ttf)}
@@ -9,17 +9,17 @@
   canvas{position:absolute;left:0;top:0}
 </style></head>
 <body><canvas id="c" width="1920" height="1080"></canvas>
-<script src="mock27.js"></script>
+<script src="draw.js"></script>
 <script>
 fonts(function(){
 sky(); skyline(mix(BG1,B,.22),820,120,260,40,90,0); c.fillStyle=rgba(BG0,0.7);c.fillRect(0,0,1920,1080);
-const tabs=['LOOK','MOTION','ANIMATIONS','SOUND','PAD','APPS','SYSTEM','REMAP'], curTab=0;
-const rows=[['THEME','SYNTHWAVE  >'],['CLOCK','24 HOUR'],['CLOCK SECONDS','ON'],['SECOND CLOCK ZONE','LONDON'],['STATS PANEL','OFF'],['WALLPAPER','NEON CITY LAYERS'],['WALLPAPER OPTIONS','>'],['RELOAD WALLPAPERS','>'],['SCREENSAVER','CLOCK AND WALLPAPER  >']];
+const tabs=[], curTab=-1;
+const rows=[['COLOR','ACCENT  >'],['HUE','330'],['SATURATION','82'],['BRIGHTNESS','100'],['HEX','#FF2E97'],['READABILITY','READABLE'],['SAVED THEMES','NEON TEA  >'],['LOAD THEME','>'],['THEME NAME','THEME 1  >'],['SAVE THEME FILE','>']];
 const foc=2;
-const pw=1240,headH=108,tabH=66,rowH=70,helpH=34,footH=70,ph=headH+tabH+rows.length*rowH+footH+helpH,px=340,py=(1080-ph)/2;
+const pw=1240,headH=108,tabH=0,rowH=70,helpH=34,footH=70,ph=headH+tabH+rows.length*rowH+footH+helpH,px=340,py=(1080-ph)/2;
 cut(px,py,px+pw,py+ph,34,10);c.fillStyle=rgba(PANEL,.97);c.fill();c.strokeStyle=rgba(A,.65);c.lineWidth=2;c.stroke();
 const x0=px+44,x1=px+pw-44,hy=py+68;
-c.font='700 29px Orbitron';c.fillStyle=A;c.fillText('//',x0,hy);const sl=c.measureText('// ').width;c.fillStyle=TEXT;c.fillText('DECK SETUP',x0+sl,hy);
+c.font='700 29px Orbitron';c.fillStyle=A;c.fillText('//',x0,hy);const sl=c.measureText('// ').width;c.fillStyle=TEXT;c.fillText('THEME EDITOR',x0+sl,hy);
 c.font='400 17px ShareTech';c.fillStyle=DIM;const bk='BACK TO CLOSE';c.fillText(bk,x1-c.measureText(bk).width,hy-4);
 c.strokeStyle=rgba(DIM,.3);c.lineWidth=1;c.beginPath();c.moveTo(x0,py+headH-14);c.lineTo(x1,py+headH-14);c.stroke();
 const tw=(pw-88-10*(tabs.length-1))/tabs.length;
@@ -30,11 +30,12 @@ rows.forEach(([lab,val],i)=>{const top=py+headH+tabH+i*rowH,l=px+28,r=px+pw-28,t
   c.font='700 25px ShareTech';
   if(val.endsWith('  >')){const v=val.slice(0,-3);c.fillStyle=f?A:DIM;c.fillText(v,r-20-c.measureText('>').width-14-c.measureText(v).width,cy+9);c.fillStyle=A;c.fillText('>',r-20-c.measureText('>').width,cy+9);}
   else if(val==='>'){c.fillStyle=A;c.fillText('>',r-20-c.measureText('>').width,cy+9);}
+  else if(/^[0-9]+$/.test(val)){const mx=lab==='HUE'?350:100,w=300,bx=r-20-c.measureText(val).width-24-w;c.fillStyle=rgba(DIM,.3);c.fillRect(bx,cy-5,w,10);c.fillStyle=f?A:B;c.fillRect(bx,cy-5,w*Math.min(1,+val/mx),10);c.fillStyle=f?A:DIM;c.fillText(val,r-20-c.measureText(val).width,cy+9);}
   else {c.fillStyle=f?A:DIM;c.fillText(val,r-20-c.measureText(val).width,cy+9);}
   if(i<rows.length-1){c.strokeStyle=rgba(DIM,.3);c.lineWidth=1;c.beginPath();c.moveTo(l,bb+6);c.lineTo(r,bb+6);c.stroke();}
   if(f){c.strokeStyle=A;c.lineWidth=2.5;const b=16;[[l,tt,1,1],[r,tt,-1,1],[l,bb,1,-1],[r,bb,-1,-1]].forEach(([x,y,sx,sy])=>{c.beginPath();c.moveTo(x+b*sx,y);c.lineTo(x,y);c.lineTo(x,y+b*sy);c.stroke();});c.lineWidth=1;}
 });
-const help='SHOWS SECONDS ON THE TOP BAR CLOCK AND ON THE SCREENSAVER CLOCK.';
+const help='READABLE: THE TEXT, ACCENT AND PANELS HAVE ENOUGH CONTRAST.';
 const fy=py+ph-28, hyl=fy-34;
 c.font='400 17px ShareTech';c.fillStyle=rgba(TEXT,.86);c.fillText(help,x0,hyl);
 function btn(x,l){c.strokeStyle=rgba(TEXT,.85);c.lineWidth=2;c.beginPath();c.arc(x+13,fy-6,13,0,7);c.stroke();c.fillStyle=TEXT;c.font='700 14px ShareTech';c.fillText(l,x+13-c.measureText(l).width/2,fy-1);return 34;}
@@ -42,9 +43,6 @@ let x=x0;c.font='400 17px ShareTech';
 x+=btn(x,'A');c.fillStyle=DIM;c.font='400 17px ShareTech';c.fillText('SELECT',x,fy);x+=c.measureText('SELECT').width+30;
 x+=btn(x,'B');c.fillStyle=DIM;c.font='400 17px ShareTech';c.fillText('BACK',x,fy);x+=c.measureText('BACK').width+30;
 x+=btn(x,'LB')-8+14;x+=btn(x,'RB');c.fillStyle=DIM;c.font='400 17px ShareTech';c.fillText('TABS',x,fy);
-// top bar clock with seconds, as it would sit in the HUD
-c.font='700 40px Orbitron';c.fillStyle=TEXT;const t='21:47:09';c.fillText(t,1920-c.measureText(t).width-60,70);
-c.font='400 17px ShareTech';c.fillStyle=DIM;const z='LON 02:47:09';c.fillText(z,1920-c.measureText(z).width-60,96);
-tag('DESIGN MOCK (2.7 LOOK TAB, EXAMPLE VALUES), NOT A SCREENSHOT OF THE APK');
+
 });
 </script></body></html>

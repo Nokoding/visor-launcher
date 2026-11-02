@@ -2,11 +2,7 @@
 
 New in 2.8. The APPS section of the control center ([control-center.md](control-center.md)) lists the apps you used recently and can close them.
 
-![The APPS page, design mock](img/preview-cc-apps.png)
-
-![The actions of one app, design mock](img/preview-cc-actions.png)
-
-Design mocks, not screenshots. Nothing in 2.8 has run on a TV yet.
+![The control center APPS page, the task manager. A rendered preview, not a photo.](images/cc-apps.webp)
 
 ## The list
 

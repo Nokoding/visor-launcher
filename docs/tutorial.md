@@ -2,9 +2,7 @@
 
 New in 2.9. A short set of full screen lessons that teaches the controls and the features, with a TRY IT step on some of them.
 
-![A lesson with a TRY IT step done, design mock](img/preview-tutorial-try.png)
-
-A design mock, not a screenshot. Nothing in 2.9 has run on a TV yet, and the first lesson says so.
+![A tutorial lesson. A rendered preview, not a photo.](images/tutorial.webp)
 
 ## Opening it
 
@@ -48,7 +46,7 @@ The text is plain data (TutorialModel in the source), checked by tests for lengt
 
 ## What could not be checked
 
-- How the lessons read from the couch. Only a design mock exists.
+- How the lessons read from the couch.
 - Whether the PS button reaches the tutorial on this box (the PS try step). If the box swallows it, that one step cannot be completed, and NEXT still moves on.
 
 ## No try step can trap you (2.17)

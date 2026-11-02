@@ -2,9 +2,7 @@
 
 New in 2.8. The PS button menu used to be one list: recent apps, volume, Setup. It is now a control center with a strip of sections and a page of tiles under each one. It looks the same inside Visor and over other apps (the overlay needs the one adb step in [ps-menu.md](ps-menu.md)).
 
-![The QUICK page, design mock](img/preview-cc-quick.png)
-
-The images are design mocks, not screenshots. Nothing in 2.8 has run on a TV yet.
+![The control center, QUICK page. A rendered preview, not a photo.](images/cc-quick.webp)
 
 ## Moving around
 
@@ -47,6 +45,6 @@ One overlay window, as in 2.4. The views and text pieces are built when a page o
 
 ## What could not be checked
 
-- How the pages look from the couch. Only design mocks exist.
+- How the pages look from the couch.
 - Whether the overlay stays smooth on the weak GPU with seven rows of tiles.
 - Which of the global actions work on the onn box. Android decides.

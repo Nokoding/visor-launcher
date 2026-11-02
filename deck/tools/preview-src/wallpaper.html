@@ -1,5 +1,5 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><title>Deck 2.7 layered wallpaper design mock</title>
+<html><head><meta charset="utf-8"><title>Visor preview source</title>
 <style>
   @font-face{font-family:"Orbitron";font-weight:700;src:url(../../assets/fonts/orbitron-bold.ttf)}
   @font-face{font-family:"OrbitronM";font-weight:500;src:url(../../assets/fonts/orbitron-medium.ttf)}
@@ -9,7 +9,7 @@
   canvas{position:absolute;left:0;top:0}
 </style></head>
 <body><canvas id="c" width="1920" height="1080"></canvas>
-<script src="mock27.js"></script>
+<script src="draw.js"></script>
 <script>
 fonts(function(){
 sky();
@@ -33,6 +33,5 @@ lab.forEach(([t,y])=>{c.fillStyle=rgba(BG0,.8);c.fillRect(60,y-22,c.measureText(
 c.font='700 40px Orbitron';c.fillStyle=TEXT;const t='21:47';c.fillText(t,1920-c.measureText(t).width-60,70);
 c.font='400 20px ShareTech';c.fillStyle=rgba(TEXT,.85);
 c.fillText('A LAYERED WALLPAPER: NEAR LAYERS MOVE FURTHER WITH THE CAMERA THAN FAR ONES. THE EXAMPLE PACK IS BUILT THIS WAY.',60,970);
-tag('DESIGN MOCK (2.7 LAYERED WALLPAPER, CAMERA PANNED), NOT A SCREENSHOT OF THE APK');
 });
 </script></body></html>

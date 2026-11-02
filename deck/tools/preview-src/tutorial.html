@@ -1,5 +1,5 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><title>Deck 2.9 tutorial design mock</title>
+<html><head><meta charset="utf-8"><title>Visor preview source</title>
 <style>
   @font-face{font-family:"Orbitron";font-weight:700;src:url(../../assets/fonts/orbitron-bold.ttf)}
   @font-face{font-family:"OrbitronM";font-weight:500;src:url(../../assets/fonts/orbitron-medium.ttf)}
@@ -9,7 +9,7 @@
   canvas{position:absolute;left:0;top:0}
 </style></head>
 <body><canvas id="c" width="1920" height="1080"></canvas>
-<script src="mock27.js"></script>
+<script src="draw.js"></script>
 <script>
 // Same layout numbers as TutorialView and ComboLearnView (TestScreen, design pixels). ?p=lesson | try | combo
 const page=(new URLSearchParams(location.search)).get('p')||'lesson';
@@ -32,9 +32,9 @@ if(page==='combo'){
   c.font='700 44px Orbitron';c.fillStyle=A;c.fillText('// TUTORIAL',96,110);
   c.font='400 28px ShareTech';c.fillStyle=DIM;c.fillText(long?'8 OF 12':(page==='try'?'7 OF 12   //   ABOUT A GAME CONTROLLER':'6 OF 12'),96,158);
   c.font='700 84px Orbitron';c.fillStyle=TEXT;c.fillText(long?'IF SOMETHING GOES WRONG':(page==='try'?'COMBOS':'REMAPPING BUTTONS'),96,268);
-  const L=long?['DO NOT TRY THESE NOW. THEY ARE FOR WHEN SOMETHING GOES WRONG.','HOLD BACK FOR 6 SECONDS. IT CLEARS THE D-PAD, OK AND BACK REMAPS.','HOLD THE PS BUTTON FOR 4 SECONDS IN AN APP. THE APP KEEPS IT.','HOLD START AND SELECT FOR 2 SECONDS TO LEAVE THE CONTROLLER TESTS.','SETUP, REMAP, RESET ALL REMAPS CLEARS EVERY REMAP. PRESS OK TWICE.','PICTURE LOOKS WRONG? USE RESTORE DISPLAY IN SETUP OR THE PS MENU.','FROM A PHONE: ADB SHELL WM SIZE RESET, THEN WM DENSITY RESET.','OR SEND DECK_CMD RESTORE_DISPLAY TO DECK. SEE DOCS/GAME-PROFILES.MD.']
+  const L=long?['DO NOT TRY THESE NOW. THEY ARE FOR WHEN SOMETHING GOES WRONG.','HOLD BACK FOR 6 SECONDS. IT CLEARS THE D-PAD, OK AND BACK REMAPS.','HOLD THE PS BUTTON FOR 4 SECONDS IN AN APP. THE APP KEEPS IT.','HOLD START AND SELECT FOR 2 SECONDS TO LEAVE THE CONTROLLER TESTS.','SETUP, REMAP, RESET ALL REMAPS CLEARS EVERY REMAP. PRESS OK TWICE.','PICTURE LOOKS WRONG? USE RESTORE DISPLAY IN SETUP OR THE PS MENU.','FROM A PHONE: ADB SHELL WM SIZE RESET, THEN WM DENSITY RESET.','OR SEND DECK_CMD RESTORE_DISPLAY TO VISOR. SEE DOCS/GAME-PROFILES.MD.']
    :page==='try'?['A COMBO USES TWO CONTROLLER BUTTONS TOGETHER.','HOLD THE FIRST BUTTON, THEN PRESS THE SECOND.','THE FIRST BUTTON STILL GOES TO THE APP. ONLY THE SECOND IS TAKEN.','MAKE ONE IN SETUP, REMAP, COMBOS.','ALLOWED: X, Y, L1, R1, L2, R2, THE STICK CLICKS, CREATE, OPTIONS.','COMBOS FOLLOW REMAP IN GAMES, SO GAMES KEEP THEIR BUTTONS.']
-   :['IN SETUP, REMAP, THE SPARE REMOTE BUTTONS CAN RUN ACTIONS.','PICK A BUTTON, THEN SET A SHORT PRESS AND A LONG PRESS ACTION.','LEARN A BUTTON FINDS ANY BUTTON, EVEN ONES DECK DOES NOT KNOW.','A REMAP RUNS AN ACTION. IT NEVER PRESSES ANOTHER BUTTON.','A REMAPPED BUTTON STOPS DOING ITS OLD JOB.','IN OTHER APPS IT NEEDS THE OVERLAY SERVICE.'];
+   :['IN SETUP, REMAP, THE SPARE REMOTE BUTTONS CAN RUN ACTIONS.','PICK A BUTTON, THEN SET A SHORT PRESS AND A LONG PRESS ACTION.','LEARN A BUTTON FINDS ANY BUTTON, EVEN ONES VISOR DOES NOT KNOW.','A REMAP RUNS AN ACTION. IT NEVER PRESSES ANOTHER BUTTON.','A REMAPPED BUTTON STOPS DOING ITS OLD JOB.','IN OTHER APPS IT NEEDS THE OVERLAY SERVICE.'];
   const hasTry=page==='try',top=350,bottom=hasTry?700:880,lineH=Math.min(60,(bottom-top)/L.length),sc=Math.min(1,lineH/(60*.86));
   c.font='400 '+(40*sc)+'px ShareTech';c.fillStyle=TEXT;L.forEach((s,i)=>c.fillText(s,96,top+40*sc+i*lineH));
   if(hasTry){cut(96,730,1824,890,18,6);c.fillStyle=rgba(A,.22);c.fill();c.strokeStyle=A;c.lineWidth=2;c.stroke();
@@ -45,6 +45,5 @@ if(page==='combo'){
   c.font='400 18px ShareTech';c.fillStyle=DIM;c.fillText('TOP BUTTONS: PUSH THE RIGHT STICK UP (OR UP ON THE REMOTE)',960-c.measureText('TOP BUTTONS: PUSH THE RIGHT STICK UP (OR UP ON THE REMOTE)').width/2,1022);
   chips(['PREVIOUS','NEXT','EXIT']);
 }
-tag('DESIGN MOCK (TUTORIAL AND COMBO SCREENS, EXAMPLE TEXT), NOT A SCREENSHOT OF THE APK');
 });
 </script></body></html>

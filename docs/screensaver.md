@@ -2,9 +2,7 @@
 
 New in 2.7. Visor has its own screensaver. Android calls it a "dream", so the code calls it DeckDream, but it is the same thing as the screensaver in your TV's settings. It shows a big clock and the date in the HUD style, with your wallpaper (or the built-in skyline) panning slowly behind it, heavily dimmed. The clock block moves to a new place every minute so no part of the screen holds a bright shape for hours.
 
-![The screensaver, design mock](img/preview-screensaver.png)
-
-The image is a design mock rendered from deck/tools/mock/screensaver-mock.html. It is not a screenshot. Nothing in 2.7 has run on a TV yet, see What could not be checked at the end.
+![The screensaver clock. A rendered preview, not a photo.](images/screensaver.webp)
 
 ## Try it first
 

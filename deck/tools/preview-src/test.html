@@ -1,17 +1,15 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><title>Deck 2.2 test screens design mock</title>
+<html><head><meta charset="utf-8"><title>Visor preview source</title>
 <style>
   @font-face{font-family:"Orbitron";font-weight:700;src:url(../../assets/fonts/orbitron-bold.ttf)}
   @font-face{font-family:"Rajdhani";font-weight:600;src:url(../../assets/fonts/rajdhani-semibold-latin.ttf)}
   @font-face{font-family:"ShareTech";font-weight:400;src:url(../../assets/fonts/share-tech-mono.ttf)}
   html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#07040D}
   canvas{position:absolute;left:0;top:0}
-  #mocktag{position:absolute;left:0;top:8px;width:1920px;text-align:center;font:400 22px "ShareTech",monospace;color:#07040D}
-  #mocktag span{background:#FFE14D;padding:4px 18px;border:3px solid #07040D;outline:2px solid #FFE14D}
 </style></head>
 <body>
 <canvas id="c" width="1920" height="1080"></canvas>
-<div id="mocktag"><span id="tagtext"></span></div>
+
 <script>
 // Same coordinates, outline points and colors as PadTestView.java and GyroTestView.java (SYNTHWAVE theme).
 const VIEW = new URLSearchParams(location.search).get('view') || 'gamepad';
@@ -34,29 +32,34 @@ function chips(labels,widths,on){let x=1824;const r=[];for(let i=labels.length-1
     c.strokeStyle=on[i]?A:rgba(DIM,.7);c.lineWidth=2;c.stroke();txt(l,(L+R)/2,(T+Bm)/2+9,on[i]?BG0:TEXT,'label',26,'center');});}
 
 function gamepad(){
-  document.getElementById('tagtext').textContent='DESIGN MOCK OF THE 2.2 GAMEPAD TEST (FULL MODE, 11 OF 16 PRESSED), NOT A SCREENSHOT OF THE APK';
+  
   background();
   txt('GAMEPAD TEST',96,110,A,'head',44);
   txt('FULL TEST: A BUTTON STAYS LIT ONCE PRESSED. PRESS EVERY REQUIRED BUTTON.',96,152,DIM,'label',26);
   txt('DETECTED: PLAYSTATION  //  DUALSENSE',96,200,TEXT,'mono',22);
   txt('DUALSENSE WIRELESS CONTROLLER  //  VENDOR 054C  PRODUCT 0CE6',96,232,DIM,'mono',22);
-  chips(['FULL TEST','QUICK TEST','RESET','EXIT'],[190,200,140,120],[true,false,false,false]);
-  const CX=960,CY=620,CM=50, o=outline(PS_HALF);
-  c.beginPath();o.forEach(([x,z],i)=>{const X=CX+x*CM,Y=CY+z*CM;i?c.lineTo(X,Y):c.moveTo(X,Y);});c.closePath();
+  chips(['FULL TEST','QUICK TEST','RESET','SKIP NEXT','EXIT'],[190,200,140,190,120],[true,false,false,false,false]);
+  const CX=960,CY=620;
+  const S0=[0,-250],SG=[60,-253,130,-254,188,-252,250,-250,292,-236,314,-213,336,-190,352,-130,364,-73,378,-20,390,30,392,83,394,120,392,150,388,178,384,215,365,245,330,255,315,265,292,268,276,258,266,246,266,232,262,219,255,190,240,150,222,124,210,100,195,90,181,83,150,78,60,80,0,81];
+  const nS=SG.length/6;c.beginPath();c.moveTo(CX+S0[0],CY+S0[1]);
+  for(let i=0;i<nS;i++)c.bezierCurveTo(CX+SG[i*6],CY+SG[i*6+1],CX+SG[i*6+2],CY+SG[i*6+3],CX+SG[i*6+4],CY+SG[i*6+5]);
+  for(let i=nS-1;i>=0;i--){const x0=i===0?S0[0]:SG[(i-1)*6+4],y0=i===0?S0[1]:SG[(i-1)*6+5];c.bezierCurveTo(CX-SG[i*6+2],CY+SG[i*6+3],CX-SG[i*6],CY+SG[i*6+1],CX-x0,CY+y0);}
+  c.closePath();
   c.fillStyle=rgba(PANEL,.92);c.fill();c.strokeStyle=rgba(B,.18);c.lineWidth=10;c.stroke();c.strokeStyle=rgba(B,.9);c.lineWidth=2;c.stroke();
+  c.strokeStyle=rgba(DIM,.5);c.lineWidth=2;[[-125,1,56],[125,1,56],[-125,1,82],[125,1,82]].forEach(([x,y,r])=>{c.beginPath();c.arc(CX+x,CY+y,r,0,7);c.stroke();});
   const lit=new Set(['SOUTH','EAST','NORTH','L1','R1','L2','UP','LEFT','RIGHT','START','L3']), held=new Set(['R2held']);
   function st(name,opt){const on=lit.has(name);c.fillStyle=on?rgba(A,.9):rgba(BG0,.9);c.strokeStyle=on?A:rgba(opt?DIM:TEXT,opt?.45:.6);c.lineWidth=2;return on;}
   // d-pad
-  const dpx=-265,dpy=-60;
-  [['UP',0,-58,true],['DOWN',0,58,true],['LEFT',-58,0,false],['RIGHT',58,0,false]].forEach(([n,dx,dy,v])=>{
+  const dpx=-243,dpy=-106;
+  [['UP',0,-48,true],['DOWN',0,48,true],['LEFT',-48,0,false],['RIGHT',48,0,false]].forEach(([n,dx,dy,v])=>{
     const x=CX+dpx+dx,y=CY+dpy+dy,w=v?24:30,h=v?30:24,on=st(n);c.fillRect(x-w,y-h,2*w,2*h);c.strokeRect(x-w,y-h,2*w,2*h);
     c.fillStyle=on?BG0:TEXT;c.beginPath();const s=10;
     if(n==='UP'){c.moveTo(x,y-s);c.lineTo(x+s,y+s*.6);c.lineTo(x-s,y+s*.6);} else if(n==='DOWN'){c.moveTo(x,y+s);c.lineTo(x+s,y-s*.6);c.lineTo(x-s,y-s*.6);}
     else if(n==='LEFT'){c.moveTo(x-s,y);c.lineTo(x+s*.6,y-s);c.lineTo(x+s*.6,y+s);} else {c.moveTo(x+s,y);c.lineTo(x-s*.6,y-s);c.lineTo(x-s*.6,y+s);}
     c.closePath();c.fill();});
   // face buttons with PlayStation shapes
-  [['NORTH',0,-66],['SOUTH',0,66],['WEST',-66,0],['EAST',66,0]].forEach(([n,dx,dy])=>{
-    const x=CX+265+dx,y=CY-60+dy,on=st(n);c.beginPath();c.arc(x,y,34,0,7);c.fill();c.stroke();
+  [['NORTH',0,-57],['SOUTH',0,57],['WEST',-57,0],['EAST',57,0]].forEach(([n,dx,dy])=>{
+    const x=CX+244+dx,y=CY-106+dy,on=st(n);c.beginPath();c.arc(x,y,30,0,7);c.fill();c.stroke();
     c.strokeStyle=on?BG0:rgba(TEXT,.8);c.lineWidth=3;c.beginPath();c.arc(x,y,26,0,7);c.stroke();const s=26*.46;c.beginPath();
     if(n==='SOUTH'){c.moveTo(x-s,y-s);c.lineTo(x+s,y+s);c.moveTo(x-s,y+s);c.lineTo(x+s,y-s);} else if(n==='EAST'){c.arc(x,y,s,0,7);}
     else if(n==='WEST'){c.rect(x-s*.85,y-s*.85,s*1.7,s*1.7);} else {c.moveTo(x,y-s);c.lineTo(x+s,y+s*.75);c.lineTo(x-s,y+s*.75);c.closePath();}
@@ -66,13 +69,13 @@ function gamepad(){
   [['L2',-300,-342,1.0],['R2',300,-342,0.42]].forEach(([n,dx,dy,v])=>{const x=CX+dx,y=CY+dy,on=st(n);cut(x-90,y-22,x+90,y+22,10,4);c.fill();
     if(!on){c.fillStyle=rgba(B,.55);c.fillRect(x-86,y-18,172*v,36);} cut(x-90,y-22,x+90,y+22,10,4);c.stroke();txt(n,x,y+9,on?BG0:TEXT,'label',26,'center');});
   // sticks
-  [['L3',-130,90,-0.62,0.31],['R3',130,90,0.0,-0.88]].forEach(([n,dx,dy,sx,sy])=>{const x=CX+dx,y=CY+dy,on=st(n);c.beginPath();c.arc(x,y,58,0,7);c.fill();c.stroke();
+  [['L3',-125,1,-0.62,0.31],['R3',125,1,0.0,-0.88]].forEach(([n,dx,dy,sx,sy])=>{const x=CX+dx,y=CY+dy,on=st(n);c.beginPath();c.arc(x,y,58,0,7);c.fill();c.stroke();
     c.strokeStyle=rgba(DIM,.4);c.beginPath();c.arc(x,y,40,0,7);c.stroke();c.fillStyle=on?BG0:A;c.beginPath();c.arc(x+sx*40,y+sy*40,14,0,7);c.fill();
-    txt(n,x,y-68,on?A:DIM,'label',26,'center');});
+    txt(n,x,y+112,on?A:DIM,'label',26,'center');});
   // create, options, ps, touchpad
-  [['SELECT',-200,-175,'CREATE'],['START',200,-175,'OPTIONS']].forEach(([n,dx,dy,l])=>{const x=CX+dx,y=CY+dy,on=st(n);c.beginPath();c.roundRect(x-46,y-16,92,32,16);c.fill();c.stroke();txt(l,x,y+6,on?BG0:TEXT,'mono',18,'center');});
-  {const x=CX,y=CY+40;st('HOME',true);c.beginPath();c.arc(x,y,26,0,7);c.fill();c.stroke();txt('PS',x,y+6,DIM,'mono',18,'center');}
-  {const x=CX,y=CY-140;st('TOUCHPAD',true);cut(x-135,y-62,x+135,y+62,14,6);c.fill();c.stroke();txt('TOUCHPAD',x,y+9,DIM,'label',26,'center');}
+  [['SELECT',-181,-190,'CREATE'],['START',181,-190,'OPTIONS']].forEach(([n,dx,dy,l])=>{const x=CX+dx,y=CY+dy,on=st(n);c.beginPath();c.roundRect(x-11,y-18,22,36,10);c.fill();c.stroke();});
+  {const x=CX,y=CY-12;st('HOME',true);c.beginPath();c.arc(x,y,26,0,7);c.fill();c.stroke();txt('PS',x,y+6,DIM,'mono',18,'center');}
+  {const x=CX,y=CY-155;st('TOUCHPAD',true);cut(x-156,y-85,x+156,y+85,14,6);c.fill();c.stroke();txt('TOUCHPAD',x,y+9,DIM,'label',26,'center');}
   // sidebar
   let x=1460,y=330;txt('REQUIRED BUTTONS',x,y,DIM,'label',26);txt('11/16',x,y+74,TEXT,'head',64);y+=130;
   txt('OPTIONAL (NOT COUNTED)',x,y,DIM,'label',26);y+=36;txt('PS  NOT SEEN',x,y,DIM,'mono',22);y+=32;txt('TOUCHPAD  NOT SEEN',x,y,DIM,'mono',22);y+=60;
@@ -80,8 +83,8 @@ function gamepad(){
   [['L2',1.0],['R2',0.42]].forEach(([n,v])=>{txt(n,x,y,TEXT,'mono',22);c.fillStyle=rgba(DIM,.25);c.fillRect(x+70,y-16,230,14);c.fillStyle=A;c.fillRect(x+70,y-16,230*v,14);txt('+'+v.toFixed(2),x+312,y,TEXT,'mono',22);y+=32;});
   y+=28;txt('STICKS (SHOWN, NOT REQUIRED)',x,y,DIM,'label',26);y+=34;txt('L  X-0.62  Y+0.31',x,y,TEXT,'mono',22);y+=32;txt('R  X 0.00  Y-0.88',x,y,TEXT,'mono',22);
   txt('OTHER KEYS SEEN',96,330,DIM,'label',26);txt('BUTTON_C (98)',96,366,TEXT,'mono',22);
-  txt('STATUS',96,700,DIM,'label',26);txt('PRESS THE DARK BUTTONS',96,736,TEXT,'mono',22);
-  txt('EXIT: BACK ON THE REMOTE  //  HOLD OPTIONS + CREATE FOR 2 S  //  CLICK EXIT  //  REMOTE: LEFT FULL, RIGHT QUICK, OK RESET',960,1046,DIM,'mono',18,'center');
+  txt('STATUS',96,700,DIM,'label',26);txt('PRESS THE DARK BUTTONS',96,736,TEXT,'mono',22);txt('NEXT: R2   (SKIP NEXT IF THE BOX NEVER SHOWS IT)',96,768,DIM,'mono',18);txt('DRAWING: DUALSENSE',96,800,DIM,'mono',22);
+  txt('EXIT: BACK ON THE REMOTE  //  HOLD CIRCLE FOR 1.5 S  //  OR OPTIONS + CREATE FOR 2 S  //  CLICK EXIT  //  REMOTE: LEFT FULL, RIGHT QUICK, OK RESET',960,1046,DIM,'mono',18,'center');
 }
 
 // ---------- gyro test: same model and projection as ControllerModel.java and GyroTestView.java
@@ -105,7 +108,7 @@ function buildModel(){const V=[],F=[];const vert=(x,y,z)=>(V.push([x,y,z]),V.len
   return {V,F};}
 function newell(P,f){let nx=0,ny=0,nz=0;for(let i=0;i<f.length;i++){const a=P[f[i]],b=P[f[(i+1)%f.length]];nx+=(a[1]-b[1])*(a[2]+b[2]);ny+=(a[2]-b[2])*(a[0]+b[0]);nz+=(a[0]-b[0])*(a[1]+b[1]);}return [nx,ny,nz];}
 function gyro(){
-  document.getElementById('tagtext').textContent='DESIGN MOCK OF THE 2.2 GYRO TEST (TILTED UP AND LEFT, SWAY PREVIEW ON), NOT A SCREENSHOT OF THE APK';
+  
   background();
   txt('GYRO TEST',96,110,A,'head',44);
   txt('TILT AND TURN THE CONTROLLER. A OR X (OK ON THE REMOTE) RECENTERS. Y SWITCHES SWAY PREVIEW.',96,152,DIM,'label',26);

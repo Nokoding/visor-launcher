@@ -4,9 +4,7 @@ Visor's background is a procedural skyline that it draws itself. New in 2.7: you
 
 Nothing changes unless you pick a wallpaper. The built-in skyline stays the default.
 
-![Layered wallpaper mock](img/preview-wallpaper.png)
-
-That image is a design mock, not a screenshot. Nothing in this release has run on a TV yet.
+![A layered wallpaper. A rendered preview, not a photo.](images/wallpaper.webp)
 
 ## Choosing one
 

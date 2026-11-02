@@ -1,5 +1,5 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><title>Deck 2.7 screensaver design mock</title>
+<html><head><meta charset="utf-8"><title>Visor preview source</title>
 <style>
   @font-face{font-family:"Orbitron";font-weight:700;src:url(../../assets/fonts/orbitron-bold.ttf)}
   @font-face{font-family:"OrbitronM";font-weight:500;src:url(../../assets/fonts/orbitron-medium.ttf)}
@@ -9,7 +9,7 @@
   canvas{position:absolute;left:0;top:0}
 </style></head>
 <body><canvas id="c" width="1920" height="1080"></canvas>
-<script src="mock27.js"></script>
+<script src="draw.js"></script>
 <script>
 fonts(function(){
 sky(); skyline(mix(BG1,B,.22),820,120,260,40,90,0); skyline(mix(BG0,B,.2),980,100,200,60,120,200);
@@ -26,6 +26,5 @@ c.strokeStyle=rgba(A,.6);c.lineWidth=3;c.beginPath();c.moveTo(bx+6,by+24);c.line
 // drift path hint
 c.setLineDash([6,10]);c.strokeStyle=rgba(TEXT,.35);c.lineWidth=2;c.beginPath();c.moveTo(bx+330,by-90);c.bezierCurveTo(900,150,1300,900,1360,760);c.stroke();c.setLineDash([]);
 c.font='400 20px ShareTech';c.fillStyle=rgba(TEXT,.8);c.fillText('THE CLOCK BLOCK DRIFTS TO A NEW SPOT EVERY MINUTE SO NO PIXEL STAYS LIT.',bx,by+170);
-tag('DESIGN MOCK (2.7 SCREENSAVER, EXAMPLE VALUES), NOT A SCREENSHOT OF THE APK');
 });
 </script></body></html>

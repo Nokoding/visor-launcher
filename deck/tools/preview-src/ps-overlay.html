@@ -1,17 +1,15 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><title>Deck 2.4 PS overlay design mock</title>
+<html><head><meta charset="utf-8"><title>Visor preview source</title>
 <style>
   @font-face{font-family:"Orbitron";font-weight:700;src:url(../../assets/fonts/orbitron-bold.ttf)}
   @font-face{font-family:"Rajdhani";font-weight:600;src:url(../../assets/fonts/rajdhani-semibold-latin.ttf)}
   @font-face{font-family:"ShareTech";font-weight:400;src:url(../../assets/fonts/share-tech-mono.ttf)}
   html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#000}
   canvas{position:absolute;left:0;top:0}
-  #mocktag{position:absolute;left:0;top:1032px;width:1920px;text-align:center;font:400 26px "ShareTech",monospace;color:#07040D}
-  #mocktag span{background:#FFE14D;padding:6px 22px;border:3px solid #07040D;outline:2px solid #FFE14D}
 </style></head>
 <body>
 <canvas id="c" width="1920" height="1080"></canvas>
-<div id="mocktag"><span>DESIGN MOCK (2.4 PS MENU OVER A PRETEND GAME, MID TYPING), NOT A SCREENSHOT OF THE APK</span></div>
+
 <script>
 // Same layout numbers as QuickMenu.java (SYNTHWAVE theme, SOLID, TYPE, LEFT TO RIGHT):
 // panel 640 wide, right edge at x 1824, header 104, section labels 34, rows 74, volume row 104, footer 64.
@@ -44,9 +42,9 @@ c.fillStyle='#FFEB3B';c.fillRect(800,925,60,16);c.fillRect(1060,925,60,16);
 c.font='bold 64px sans-serif';c.fillStyle='#FFFFFF';c.fillText('212',90,960);c.font='bold 28px sans-serif';c.fillText('KM/H',220,960);
 c.fillText('LAP 2/3',90,110);c.fillText('POS 3',90,150);c.fillText('01:42.338',1650,110);
 
-// ---- Deck overlay: scrim, then the panel (fully grown), rows mid typing
+// ---- Visor overlay: scrim, then the panel (fully grown), rows mid typing
 c.fillStyle=rgba(BG0,0.55);c.fillRect(0,0,1920,1080);
-const items=[['app','NEONFLIX'],['app','PIXELTUBE'],['app','STREAMBOX'],['app','RETRO RACER'],['vol','VOLUME','12 / 15'],['row','OPEN SETUP'],['row','CLOSE']];
+const items=[['app','NEONREEL'],['app','PIXELCAST'],['app','STREAMBOX'],['app','RETRO RACER'],['vol','VOLUME','12 / 15'],['row','OPEN SETUP'],['row','CLOSE']];
 const typed=[99,99,7,3,0,0,0];          // rows overlap: two done, two typing (block cursor), the rest waiting
 const pw=640,HEAD=104,SEC=34,ROW=74,VROW=104,FOOT=64;
 let ph=HEAD+SEC*2+FOOT;items.forEach(it=>ph+=it[0]==='vol'?VROW:ROW);
@@ -83,10 +81,6 @@ items.forEach((it,i)=>{
   y+=h;
 });
 c.font='400 17px ShareTech';c.fillStyle=DIM;c.fillText('CROSS SELECT   CIRCLE CLOSE   LEFT RIGHT VOLUME',x0,py+ph-26);
-// annotations
-c.font='400 20px ShareTech';c.fillStyle=rgba(TEXT,.85);
-c.fillText('PS PRESSED IN A GAME THAT IS SET TO DECK: THE GAME KEEPS RUNNING UNDERNEATH,',90,1000-500);
-c.fillText('ITS KEYS AND STICKS GO TO THE MENU UNTIL IT CLOSES. HOLD PS 4 S TO LET GO.',90,1000-470);
 }
 </script>
 </body></html>

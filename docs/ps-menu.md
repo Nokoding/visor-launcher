@@ -4,9 +4,7 @@
 
 New in 2.4. Press the PS button in any app and Visor's quick menu slides out over it: recent apps to switch to, volume, Setup (before 2.8, see the note above for what it holds now). Games that need the PS button themselves keep it.
 
-![PS menu over a game, design mock](img/preview-ps-overlay.png)
-
-The image is a design mock rendered from deck/tools/mock/ps-overlay-mock.html with QuickMenu's layout numbers, over a made up game. It's not a screenshot.
+![The PS style menu over a game. A rendered preview, not a photo.](images/ps-overlay.webp)
 
 This needs one adb step from your phone, because Android won't let you switch it on from the TV's settings for a sideloaded app. And it only works if your box passes the PS button on at all. Setup tells you both, see Status below.
 

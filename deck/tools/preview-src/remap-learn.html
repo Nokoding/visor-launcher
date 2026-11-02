@@ -1,5 +1,5 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><title>Deck 2.6 LEARN A BUTTON design mock</title>
+<html><head><meta charset="utf-8"><title>Visor preview source</title>
 <style>
   @font-face{font-family:"Orbitron";font-weight:700;src:url(../../assets/fonts/orbitron-bold.ttf)}
   @font-face{font-family:"OrbitronM";font-weight:500;src:url(../../assets/fonts/orbitron-medium.ttf)}
@@ -7,12 +7,10 @@
   @font-face{font-family:"ShareTech";font-weight:400;src:url(../../assets/fonts/share-tech-mono.ttf)}
   html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#07040D}
   canvas{position:absolute;left:0;top:0}
-  #mocktag{position:absolute;left:0;top:1032px;width:1920px;text-align:center;font:400 26px "ShareTech",monospace;color:#07040D}
-  #mocktag span{background:#FFE14D;padding:6px 22px;border:3px solid #07040D;outline:2px solid #FFE14D}
 </style></head>
 <body>
 <canvas id="c" width="1920" height="1080"></canvas>
-<div id="mocktag"><span>DESIGN MOCK (2.6 LEARN A BUTTON, EXAMPLE VALUES, NOT FROM A REAL REMOTE), NOT A SCREENSHOT OF THE APK</span></div>
+
 <script>
 // Same layout numbers as RemapLearnView.content() (design px, 1920 x 1080, SYNTHWAVE theme).
 // Every value shown is an example. Which codes the onn remote really sends is not known until it is tried on the box.
@@ -35,9 +33,9 @@ c.font='700 64px Orbitron';c.fillStyle=A;c.fillText('TV BUTTON',96,290);
 function row(y,k,v){c.font='400 18px ShareTech';c.fillStyle=DIM;c.fillText(k,96,y);c.font='400 22px ShareTech';c.fillStyle=TEXT;c.fillText(v,400,y);}
 row(360,'KEY CODE','170');row(410,'SCAN CODE','0');row(460,'DEVICE','EXAMPLE REMOTE  (4012:9001)');row(510,'SOURCE','0x301 KEYBOARD DPAD');row(560,'ID','kc:170');
 function flag(y,k,v,on){c.font='600 26px Rajdhani';c.fillStyle=TEXT;c.fillText(k,96,y);c.fillStyle=on?A:DIM;c.fillText(v,700,y);}
-flag(650,'SEEN BY DECK','NO',false);flag(710,'SEEN BY THE OVERLAY SERVICE','YES',true);
+flag(650,'SEEN BY VISOR','NO',false);flag(710,'SEEN BY THE OVERLAY SERVICE','YES',true);
 c.font='400 22px ShareTech';c.fillStyle=TEXT;
-const v=['ONLY THE SERVICE SAW IT. THE SYSTEM TOOK IT BEFORE DECK. A REMAP SHOULD STILL CATCH IT, BUT THE','SYSTEM MAY ACT ON IT TOO. TRY IT.'];v.forEach((s,i)=>c.fillText(s,96,800+i*34));
+const v=['ONLY THE SERVICE SAW IT. THE SYSTEM TOOK IT BEFORE VISOR. A REMAP SHOULD STILL CATCH IT, BUT THE','SYSTEM MAY ACT ON IT TOO. TRY IT.'];v.forEach((s,i)=>c.fillText(s,96,800+i*34));
 c.font='400 18px ShareTech';c.fillStyle=DIM;
 c.fillText('A BUTTON THAT NEVER SHOWS HERE IS KEPT BY THE BOX. NO APP CAN CATCH IT, SO NO REMAP CAN USE IT.',96,990);
 }

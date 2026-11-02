@@ -2,9 +2,6 @@
 
 Two screens in Setup, PAD (new in 2.2), plus GYRO CALIBRATION (new in 2.3). They check that every button and the motion sensors on your controller reach Visor. Both take over the whole screen and keep every button to themselves, so nothing behind them moves, opens or launches while you test.
 
-
-The images here are design mocks rendered from deck/tools/mock/test-mock.html with the same layout numbers as the app. They are not screenshots.
-
 ## Gamepad test
 
 Setup, PAD, GAMEPAD TEST, then pick a mode. You can switch modes on the screen too (the FULL TEST and QUICK TEST chips, or left and right on the remote).
@@ -43,12 +40,11 @@ Lots of TV boxes grab the PS or Guide button for themselves, and some never pass
 
 New in 2.17: the 3D controller has grips, bumpers and triggers, and you can use your own model file, see [gyro-models.md](gyro-models.md).
 
-
 Setup, PAD, GYRO TEST. A low poly controller turns as your real one turns. It's drawn with plain Canvas: a PlayStation or Xbox shape (generic gets the PlayStation shape without the touchpad), neon outline, faces shaded by how much they face you.
 
 - **RECENTER** (A on the controller, OK on the remote, or the chip): the way you hold it now becomes straight. The screen also recenters once on its own when the first sensor reading comes in. (In 2.2 X recentered too. In 2.3 X opens calibration.)
 - **CALIBRATE** (X or Square on the controller, or the chip): opens GYRO CALIBRATION, and comes back here when it's done.
-- **SWAY PREVIEW** (Y, left or right on the remote, or the chip): a mock tile that sways exactly like the focused tile on the home screen, with your real Gyro direction, Gyro strength and Reduce effects. Use it to check the direction you picked. If Reduce effects is on or Gyro sway is off in Setup, the tile stays still and says why.
+- **SWAY PREVIEW** (Y, left or right on the remote, or the chip): a tile that sways exactly like the focused tile on the home screen, with your real Gyro direction, Gyro strength and Reduce effects. Use it to check the direction you picked. If Reduce effects is on or Gyro sway is off in Setup, the tile stays still and says why.
 - **Corner markers** TL, TR, BL and BR light up when you tilt clearly into that corner (at least 10 degrees, and diagonal).
 - **Tilt level**: a dot that moves the way you tilt, with a trail of the last second. The rim is 45 degrees.
 - **Numbers**: pitch (up is +), roll (right is +) and yaw (turning left is +) in degrees, gyro rates in rad/s and the accelerometer in m/s2, both after calibration.

@@ -1,5 +1,5 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><title>Deck design mock</title>
+<html><head><meta charset="utf-8"><title>Visor preview source</title>
 <style>
   /* 2.1 fonts, loaded from the same files the APK ships */
   @font-face{font-family:"Orbitron";font-weight:700;src:url(../../assets/fonts/orbitron-bold.ttf)}
@@ -23,8 +23,6 @@
   .gtile{position:absolute;width:288px;height:162px;transform-origin:50% 50%}
   .lbl{position:absolute;left:0;right:0;text-align:center;color:var(--text);font-weight:700;letter-spacing:1px}
   svg{position:absolute;left:0;top:0;overflow:visible}
-  #mocktag{left:0;top:1032px;width:1920px;text-align:center;font:400 26px "ShareTech",monospace;color:#07040D}
-  #mocktag span{background:#FFE14D;padding:6px 22px;border:3px solid #07040D;outline:2px solid #FFE14D}
 </style></head>
 <body>
 <div id="base" class="abs"></div>
@@ -33,7 +31,7 @@
 <svg id="hud" width="1920" height="1080"></svg>
 <div id="stage" class="abs" style="left:0;top:0;width:1920px;height:1080px"></div>
 <svg id="fx" width="1920" height="1080"></svg>
-<div id="mocktag" class="abs"><span>DESIGN MOCK (2.1 FONTS AND DOCK RECENTS), NOT A SCREENSHOT OF THE APK</span></div>
+
 <script>
 const LAYOUT = new URLSearchParams(location.search).get('layout') || 'wheel';
 const PTR = new URLSearchParams(location.search).get('pointer') === '1';
@@ -46,7 +44,7 @@ function mixHex(a,b,t){const x=parseInt(a.slice(1),16),y=parseInt(b.slice(1),16)
 function rgba(hex,a){const n=parseInt(hex.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;}
 
 // Panorama: same recipe as Panorama.java (sky, haze, wrapped skylines, grid floor).
-// Pan state for the mock: camera 3 steps to the right (Follow), still catching up.
+// Pan state for the preview: camera 3 steps to the right (Follow), still catching up.
 const PAN_X = LAYOUT==='grid' ? 420 : 180, PAN_Y = LAYOUT==='grid' ? 30 : 0;
 (function(){
   const cv=document.getElementById('pano'), c=cv.getContext('2d'), W=1920, H=1080, hz=H*0.60;
@@ -104,11 +102,11 @@ const fr={stroke:rgba(A,.7),'stroke-width':3,fill:'none'};
 [[70,72,70,30,112,30],[1808,30,1850,30,1850,72],[70,1008,70,1050,112,1050],[1808,1050,1850,1050,1850,1008]].forEach(p=>el('polyline',Object.assign({points:p.join(',').replace(/(\d+),(\d+),?/g,'$1,$2 ')},fr),hud));
 for(let i=0;i<=20;i++){const y=250+i*22,len=i%5===0?16:7;el('line',{x1:74,y1:y,x2:74+len,y2:y,stroke:rgba(DIM,.35),'stroke-width':1.2},hud);el('line',{x1:1846,y1:y,x2:1846-len,y2:y,stroke:rgba(DIM,.35),'stroke-width':1.2},hud);}
 function txt(parent,x,y,s,size,fill,opt){const t=el('text',Object.assign({x,y,fill,'font-size':size,'font-family':'ShareTech'},opt||{}),parent);t.textContent=s;return t;}
-txt(hud,146,102,'DECK',34,TEXT,{'font-family':'Orbitron','font-weight':700,'letter-spacing':'2.7px'});
+txt(hud,146,102,'VISOR',34,TEXT,{'font-family':'Orbitron','font-weight':700,'letter-spacing':'2.7px'});
 const brandW=document.getElementById('hud').lastChild.getComputedTextLength();
-txt(hud,150+brandW,104,'//HOME',15,A,{'font-weight':700});
+txt(hud,150+Math.max(brandW,138)+14,104,'//HOME',15,A,{'font-weight':700});
 const appsN = 12;
-// stats strip (values are example readings in the mock)
+// stats strip (values are example readings in the preview)
 (function(){
   const g=hud, y0=142, h=54, cy=y0+h/2, base=cy+6;
   function box(x,w){el('path',{d:cut(96+x,y0,96+x+w,y0+h,12,4),fill:rgba(PANEL,.55),stroke:rgba(A,.30),'stroke-width':1.2},g); return 96+x;}
@@ -124,10 +122,10 @@ const appsN = 12;
   x=box(614,250); ring(x+29,.71,true); txt(g,x+54,base,'RAM 71%',17,TEXT,{'font-weight':700}); txt(g,x+152,base,'0.9/1.3G',15,DIM);
   x=box(876,250); ring(x+29,.46,true); txt(g,x+54,base,'STO 46%',17,TEXT,{'font-weight':700}); txt(g,x+152,base,'3.4/7.4G',15,DIM);
   x=box(1138,230); spark(x+14,cy-12,90,24,fps,60); txt(g,x+114,base,'FPS 60',17,TEXT,{'font-weight':700});
-  x=box(1380,200); ring(x+29,.04,false); txt(g,x+54,base,'DECK CPU 4%',17,TEXT,{'font-weight':700});
+  x=box(1380,200); ring(x+29,.04,false); txt(g,x+54,base,'VISOR CPU 4%',17,TEXT,{'font-weight':700});
   txt(g,1824,base,'LAYOUT '+LAYOUT.toUpperCase(),15,DIM,{'text-anchor':'end'});
 })();
-// input hints: wheel mock in remote mode, grid mock in gamepad mode with PlayStation style glyphs
+// input hints: wheel preview in remote mode, grid preview in gamepad mode with PlayStation style glyphs
 const GAMEPAD = LAYOUT==='grid' && !PTR;
 let hx=100;
 if(PTR){
@@ -225,7 +223,7 @@ if(LAYOUT!=='grid'){
   const COLS=5, GX=96, GY=216, GW=288, GH=162, GPX=360, GPY=214, focus=PTR?7:6;
   const tiltY=PTR?0:-8, tiltX=PTR?0:4;
   const fc=focus%COLS, frow=Math.floor(focus/COLS);
-  // pointer mock: cursor over the upper right part of WEBVIEW
+  // pointer preview: cursor over the upper right part of WEBVIEW
   const CUR = PTR ? [GX+2*GPX+GW*0.80, GY+GPY+GH*0.28] : null;
   if(PTR){ const R=432; div('abs','left:'+(CUR[0]-R)+'px;top:'+(CUR[1]-R)+'px;width:'+(2*R)+'px;height:'+(2*R)+'px;border-radius:50%;'
     +'background:radial-gradient(circle,'+rgba(A,.26)+' 0%,'+rgba(B,.10)+' 45%,rgba(0,0,0,0) 100%)',stage); }
@@ -315,7 +313,7 @@ if(LAYOUT!=='grid'){
     el('rect',{x:x+w/2-th/2+4,y:y+h/2-th/2+4,width:th-8,height:th-8,rx:(th-8)*.22,fill:`url(#rg${i})`},g);
   });
 })();
-// system cursor (the app can hide it with Hide system cursor) and a mock note
+// system cursor (the app can hide it with Hide system cursor) and a preview note
 if(PTR){
   const g=el('svg',{width:1920,height:1080},document.body); g.style.position='absolute';
   const [x,y]=window.CURSOR;
@@ -329,23 +327,6 @@ if(PTR){
     el('path',{d:`M${x},${y-a}L${x},${y-z}M${x},${y+a}L${x},${y+z}M${x-a},${y}L${x-z},${y}M${x+a},${y}L${x+z},${y}`,stroke:col,'stroke-width':sw},g);
   });
   el('circle',{cx:x,cy:y,r:1.6,fill:TEXT},g);
-  const Y='#FFE14D';
-  el('rect',{x:1300,y:664,width:520,height:96,fill:'rgba(7,4,13,.85)',stroke:Y,'stroke-width':2},g);
-  txt(g,1314,692,'MOCK NOTE: POINTER MODE (DUALSENSE TOUCHPAD)',15,Y,{'font-weight':700});
-  txt(g,1314,714,'GLOW FOLLOWS THE CURSOR, NEARBY TILES PUSH AWAY,',14,Y);
-  txt(g,1314,734,'HOVERED TILE TILTS TOWARD IT, EDGE ARC FACES IT.',14,Y);
-  txt(g,1314,752,'CLICK OPENS. SCROLL MOVES THE GRID.',14,Y);
-}
-// mock-only annotation for the pan behavior (not drawn by the app)
-if(LAYOUT!=='grid'){
-  const g=el('svg',{width:1920,height:1080},document.body); g.style.position='absolute';
-  const Y='#FFE14D';
-  el('path',{d:'M1160,620 L1420,620 M1400,608 L1422,620 L1400,632',stroke:Y,'stroke-width':3,fill:'none','stroke-linecap':'round'},g);
-  el('path',{d:'M1180,640 L1330,640 M1312,630 L1332,640 L1312,650',stroke:rgba(Y,.55),'stroke-width':2,fill:'none','stroke-linecap':'round'},g);
-  el('rect',{x:1436,y:596,width:384,height:72,fill:'rgba(7,4,13,.82)',stroke:Y,'stroke-width':2},g);
-  txt(g,1450,624,'MOCK NOTE: PRESS RIGHT, THE CITY',15,Y,{'font-weight':700});
-  txt(g,1450,646,'PANS RIGHT (FOLLOW). CAMERA LAGS',15,Y,{'font-weight':700});
-  txt(g,1450,662,'ABOUT 1.5 S AND NEVER RUNS OUT.',13,Y);
 }
 </script>
 </body></html>

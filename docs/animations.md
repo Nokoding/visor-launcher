@@ -2,9 +2,7 @@
 
 New in 2.3. Menus in Visor don't just pop up anymore. Hold OK (or press X) on an app and its icon glides to the side of the screen, a panel grows out of it, and the options type in like commands in a terminal. Every other menu gets the same text animation and sounds, without the icon move.
 
-![Options flyout design mock](img/preview-flyout.png)
-
-The image is a design mock rendered from deck/tools/mock/flyout-mock.html with the same layout numbers as the app. It's not a screenshot.
+![Options flyout with typed rows. A rendered preview, not a photo.](images/flyout.webp)
 
 ## Where it shows
 

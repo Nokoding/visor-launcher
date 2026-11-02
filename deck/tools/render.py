@@ -10,7 +10,7 @@ with sync_playwright() as p:
     pg = b.new_page(viewport={"width": w, "height": h}, device_scale_factor=1)
     pg.goto(Path(src).resolve().as_uri() + query)
     pg.wait_for_timeout(300)
-    pg.evaluate("document.fonts.ready.then(() => document.fonts.size)")  # bundled TTFs (2.1 mocks)
+    pg.evaluate("document.fonts.ready.then(() => document.fonts.size)")  # bundled TTFs
     pg.wait_for_timeout(200)
     pg.screenshot(path=out, full_page=False, omit_background=False)
     b.close()

@@ -1,5 +1,5 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><title>Deck 2.8 control center design mock</title>
+<html><head><meta charset="utf-8"><title>Visor preview source</title>
 <style>
   @font-face{font-family:"Orbitron";font-weight:700;src:url(../../assets/fonts/orbitron-bold.ttf)}
   @font-face{font-family:"OrbitronM";font-weight:500;src:url(../../assets/fonts/orbitron-medium.ttf)}
@@ -9,7 +9,7 @@
   canvas{position:absolute;left:0;top:0}
 </style></head>
 <body><canvas id="c" width="1920" height="1080"></canvas>
-<script src="mock27.js"></script>
+<script src="draw.js"></script>
 <script>
 // Same layout numbers as QuickMenu.java (2.8): panel 960 wide at the right edge (right edge x 1824), head 100,
 // strip 58, seven rows of 84, footer 92. Pages: quick, apps, actions.
@@ -25,7 +25,7 @@ cut(px,py,px+pw,py+ph,30,10);c.fillStyle=rgba(PANEL,.97);c.fill();c.strokeStyle=
 const x0=px+40,x1=px+pw-40,hy=py+62;
 c.font='700 26px Orbitron';c.fillStyle=A;c.fillText('//',x0,hy);const sl=c.measureText('// ').width;c.fillStyle=TEXT;c.fillText('CONTROL CENTER',x0+sl,hy);
 c.font='400 17px ShareTech';c.fillStyle=DIM;
-const tagt=page==='actions'?'KILLED ROBLOX':'PS BUTTON';c.fillText(tagt,x1-c.measureText(tagt).width,hy-3);
+const tagt=page==='actions'?'KILLED STARFALL':'PS BUTTON';c.fillText(tagt,x1-c.measureText(tagt).width,hy-3);
 c.strokeStyle=rgba(DIM,.3);c.lineWidth=1;c.beginPath();c.moveTo(x0,py+HEAD-14);c.lineTo(x1,py+HEAD-14);c.stroke();
 const tabs=['QUICK','APPS','DISPLAY','CONTROLLER','SOUND','SYSTEM'];const cur=page==='quick'?0:1;
 const tw=(x1-x0-8*5)/6;
@@ -52,23 +52,22 @@ if(page==='quick'){
   tile(2,0,1,'NEXT','');tile(2,1,1,'PREVIOUS','');
   tile(3,0,1,'SCREENSHOT','');tile(3,1,1,'SLEEP','');
   tile(4,0,1,'HOME','');tile(4,1,1,'BACK','');
-  tile(5,0,1,'RECENTS','');tile(5,1,1,'DECK HOME','');
+  tile(5,0,1,'RECENTS','');tile(5,1,1,'VISOR HOME','');
   help='SENDS PLAY OR PAUSE TO WHATEVER IS PLAYING.';
 }else if(page==='apps'){
   header(0,'RUNNING APPS','');
-  const apps=[['ROBLOX','IN FRONT',1],['YOUTUBE','3 MIN AGO',0],['NETFLIX','2 H AGO',0],['PRIME VIDEO','5 H AGO',0],['SPOTIFY','1 D AGO',0]];
+  const apps=[['STARFALL','IN FRONT',1],['CLIPSTREAM','3 MIN AGO',0],['MOVIEBOX','2 H AGO',0],['REELHOUSE','5 H AGO',0],['TUNEBOX','1 D AGO',0]];
   apps.forEach((a,i)=>{const y=gt+(i+1)*ROW+4,h=ROW-8;const f=i===1;cut(gl,y,gl+full,y+h,14,4);c.fillStyle=rgba(BG0,.8);c.fill();c.strokeStyle=rgba(A,.5);c.lineWidth=1.2;c.stroke();if(f){c.fillStyle=rgba(A,.16);c.fill();}
     c.fillStyle=rgba(B,.5);c.fillRect(gl+14,y+10,h-20,h-20);c.font='600 28px Rajdhani';c.fillStyle=f?TEXT:rgba(TEXT,.8);c.fillText(a[0],gl+14+h-20+18,y+h/2+10);
     c.font='700 21px ShareTech';c.fillStyle=a[2]?A:DIM;c.fillText(a[1],gl+full-18-c.measureText(a[1]).width,y+h/2+8);if(i===0){c.font='400 15px ShareTech';c.fillStyle=DIM;c.fillText('PROTECTED',gl+full-18-c.measureText('PROTECTED').width,y+h-8);}if(f)brackets(gl,y,gl+full,y+h);});
   tile(6,0,2,'CLOSE ALL BACKGROUND','');
   help='OK OPENS THIS APP\'S ACTIONS: KILL, FORCE STOP, OPEN, APP INFO.';
 }else{
-  header(0,'YOUTUBE','');
+  header(0,'CLIPSTREAM','');
   [['KILL BACKGROUND','',0],['FORCE STOP','PRESS AGAIN TO CONFIRM',1],['OPEN','',0],['APP INFO','',0],['GAME PROFILE','',0],['SHOW ADB COMMAND','',0]].forEach((a,i)=>tile(i+1,0,2,a[0],a[1],{focus:a[2]===1}));
   help='EXPERIMENTAL: OPENS THE APP\'S APP INFO PAGE AND PRESSES FORCE STOP FOR YOU. NEEDS THE OVERLAY SERVICE.';
 }
 c.strokeStyle=rgba(DIM,.3);c.lineWidth=1;const hl=py+ph-52;c.beginPath();c.moveTo(x0,hl-26);c.lineTo(x1,hl-26);c.stroke();
 c.font='400 17px ShareTech';c.fillStyle=rgba(TEXT,.86);c.fillText(help,x0,hl);c.fillStyle=DIM;c.fillText('A SELECT   B BACK   LB RB SECTIONS',x0,py+ph-22);
-tag('DESIGN MOCK (2.8 CONTROL CENTER, EXAMPLE APPS), NOT A SCREENSHOT OF THE APK');
 });
 </script></body></html>

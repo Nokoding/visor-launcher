@@ -2,10 +2,6 @@
 
 New in 2.9. A combo runs an action when you hold one button and press another. For example L1 + R1 can open Visor's PS menu. You make them yourself in Setup, REMAP, COMBOS. They sit next to the single button remaps from [button-remap.md](button-remap.md) and use the same actions.
 
-![Making a combo, design mock](img/preview-combo.png)
-
-A design mock, not a screenshot. Nothing in 2.9 has run on a TV yet.
-
 ## Making one
 
 1. Setup, REMAP, COMBOS, NEW COMBO.
