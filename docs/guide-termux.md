@@ -56,7 +56,7 @@ adb devices
 1. Find the newest `visor-launcher-*.apk` at https://github.com/Nokoding/visor-launcher/releases . The beta is marked "Pre-release". GitHub's "latest release" link skips pre-releases, so use this list. Copy the link of the `.apk` file.
 2. Download it in Termux and check it (the release notes show a SHA-256 line):
 ```
-curl -L -o visor.apk https://github.com/Nokoding/visor-launcher/releases/download/v2.19-beta/visor-launcher-v2.19-beta.apk
+curl -L -o visor.apk https://github.com/Nokoding/visor-launcher/releases/download/v2.20-beta/visor-launcher-v2.20-beta.apk
 sha256sum visor.apk
 ```
 The `sha256sum` result must match the SHA-256 line in the release notes. If it does not, do not install it.
