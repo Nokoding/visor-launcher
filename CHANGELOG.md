@@ -2,7 +2,13 @@
 
 Visor Launcher was developed privately as "Deck" until this public beta. Versions below are the internal numbers.
 
-## 2.20-beta
+## Not released yet
+
+- The 12,000 triangle controller model is the default again, in the app and on the website. FULL stays in Setup (3D MODEL DETAIL). The download link on the website and in the guides points at 2.19-beta again.
+
+## 2.20-beta (extra build)
+
+This build has the full detail models as the default. It stays published as an extra. A later release must have a version code above 24 to install over it.
 
 - The controller models now keep every triangle of the originals: 111,676 for the DualSense and 43,119 for the Xbox pad (2.19-beta had cut them to 12,000). They are stored in a compact binary format (VMD), and the drawing code works out each face's direction once, not every frame. The app is about 0.9 MB bigger.
 - New Setup row 3D MODEL DETAIL: FULL (every triangle, the default) or LIGHT (12,000 triangles) in case the box stutters. Not tested on a real TV yet.

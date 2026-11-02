@@ -15,7 +15,7 @@ What is under which licence
 - The 3D controller models (deck/assets/models, site/models-*.json) are adapted from two models under Creative Commons Attribution 4.0:
     "Playstation 5 Dualsense" by AHarmlessPotato, https://skfb.ly/opKOx
     "Xbox Inalambric Controller (White)" by Chistodrako._., https://skfb.ly/o6Kox
-  Changes: scaled to real size, turned to the app's axes, joined, textures removed, small logos flattened. All triangles are kept in the full version (111,676 and 43,119); a 12,000 triangle light version is also included.
+  Changes: scaled to real size, turned to the app's axes, joined, textures removed, small logos flattened. A 12,000 triangle light version and the full version (111,676 and 43,119) are both included.
 - three.js, if vendored in site/vendor, is MIT, see the header of that file.
 
 Trademarks

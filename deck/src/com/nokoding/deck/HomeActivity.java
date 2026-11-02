@@ -675,7 +675,7 @@ public final class HomeActivity extends Activity implements Engine.Host, IconCac
         showAll = prefs.getBoolean("showAll", false);
         statsOn = prefs.getBoolean("stats", true);
         gyroOn = prefs.getBoolean("gyro", true);
-        ModelObj.lightDetail = prefs.getBoolean("modelLight", false);   // 2.18: full detail unless the user chose LIGHT
+        ModelObj.lightDetail = prefs.getBoolean("modelLight", true);   // LIGHT (12,000 triangles) unless the user chose FULL
         panFollow = !"opposite".equals(prefs.getString("panDir", "follow"));
         stickRight = !"left".equals(prefs.getString("stick", "right"));
         volume = Math.max(0, Math.min(100, prefs.getInt("volume", 70)));

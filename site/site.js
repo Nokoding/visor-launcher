@@ -56,7 +56,7 @@ async function start() {
     const test = document.createElement('canvas');
     if (!(test.getContext('webgl2') || test.getContext('webgl'))) throw new Error('no webgl');
     THREE = await import('./vendor/three.module.min.js');
-    models.dualsense = decode(await fetch('models/dualsense.vmd').then(r => r.arrayBuffer()));
+    models.dualsense = await fetch('models-dualsense.json').then(r => r.json());
   } catch (e) { showStill(); return; }
 
   let renderer;
@@ -74,73 +74,43 @@ async function start() {
   const group = new THREE.Group(); scene.add(group);
   const built = {};
 
-  // The model files are VMD: "VMD1", vertex count, triangle count (little endian ints), the size of one unit in cm (float),
-  // vertices as 16 bit integers, triangles as 16 bit indices, one button number per triangle (255 = none).
-  function decode(buf) {
-    const dv = new DataView(buf);
-    if (dv.getUint32(0, true) !== 0x31444d56) throw new Error('not a model');
-    const nv = dv.getUint32(4, true), nt = dv.getUint32(8, true), unit = dv.getFloat32(12, true);
-    const pos = new Float32Array(nv * 3);
-    for (let i = 0; i < nv * 3; i++) pos[i] = dv.getInt16(16 + i * 2, true) * unit;
-    const idxAt = 16 + nv * 6, idx = new Uint16Array(nt * 3);
-    for (let i = 0; i < nt * 3; i++) idx[i] = dv.getUint16(idxAt + i * 2, true);
-    const btnAt = idxAt + nt * 6, btn = new Uint8Array(buf, btnAt, nt);
-    return { pos, idx, btn, nt };
-  }
   function build(name) {
     const m = models[name];
-    const g0 = new THREE.BufferGeometry();
-    g0.setAttribute('position', new THREE.BufferAttribute(m.pos, 3));
-    g0.setIndex(new THREE.BufferAttribute(m.idx, 1));
-    g0.computeVertexNormals();
-    const geo = g0.toNonIndexed();            // one colour per triangle, so a lit button is a clean patch
-    g0.dispose();
-    geo.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(m.nt * 9), 3));
-    const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.5, metalness: 0.2, side: THREE.DoubleSide }));
-    const g = new THREE.Group(); g.add(mesh);
-    return { g, geo, m };
-  }
-  // Each button's glow is a soft pool of light around the middle of its faces, so it follows the shape instead of showing a hard patch.
-  function buttonSpots(b) {
-    const m = b.m, ix = m.idx, p = m.pos, spots = {};
-    const cen = new Float32Array(m.nt * 3);
-    for (let f = 0; f < m.nt; f++) for (let k = 0; k < 3; k++) cen[f * 3 + k] = (p[ix[f * 3] * 3 + k] + p[ix[f * 3 + 1] * 3 + k] + p[ix[f * 3 + 2] * 3 + k]) / 3;
-    const acc = {};
-    for (let f = 0; f < m.nt; f++) {
-      const id = m.btn[f]; if (id === 255) continue;
-      const a = acc[id] || (acc[id] = { x: 0, y: 0, z: 0, n: 0 });
-      a.x += cen[f * 3]; a.y += cen[f * 3 + 1]; a.z += cen[f * 3 + 2]; a.n++;
+    const pos = [], col = [], nrm = [], faceOf = [];
+    const V = i => new THREE.Vector3(m.v[i * 3], m.v[i * 3 + 1], m.v[i * 3 + 2]);
+    for (let fi = 0; fi < m.t.length / 3; fi++) {
+      const a = V(m.t[fi * 3]), b = V(m.t[fi * 3 + 1]), c = V(m.t[fi * 3 + 2]);
+      const n = new THREE.Vector3().subVectors(b, a).cross(new THREE.Vector3().subVectors(c, a)).normalize();
+      [a, b, c].forEach(p => { pos.push(p.x, p.y, p.z); nrm.push(n.x, n.y, n.z); col.push(0, 0, 0); faceOf.push(fi); });
     }
-    for (const id in acc) { const a = acc[id]; spots[id] = { x: a.x / a.n, y: a.y / a.n, z: a.z / a.n, r: 0.6 }; }
-    for (let f = 0; f < m.nt; f++) {
-      const id = m.btn[f]; if (id === 255) continue;
-      const s = spots[id], d = Math.hypot(cen[f * 3] - s.x, cen[f * 3 + 1] - s.y, cen[f * 3 + 2] - s.z);
-      if (d > s.r && d < 2.2) s.r = d;
-    }
-    b.cen = cen; b.spots = spots;
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    geo.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3));
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+    const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0.15, flatShading: true, side: THREE.DoubleSide }));
+    const lines = new THREE.LineSegments(new THREE.EdgesGeometry(geo, 35), new THREE.LineBasicMaterial({ color: 0xff2e97, transparent: true, opacity: 0.28 }));
+    const g = new THREE.Group(); g.add(mesh, lines);
+    return { g, geo, faceOf, m };
   }
   function paint(b) {
-    if (!b.spots) buttonSpots(b);
-    const colA = b.geo.getAttribute('color'), arr = colA.array, nt = b.m.nt, cen = b.cen;
-    const base = COL.body, hot = COL.glow;
-    const active = [];
-    const want = id => glowAll || glowSet.has(id) || (id === 4 && glowSet.has(6)) || (id === 5 && glowSet.has(7));
-    for (const id in b.spots) if (want(+id)) active.push(b.spots[id]);
-    for (let f = 0; f < nt; f++) {
-      let w = 0;
-      for (let i = 0; i < active.length; i++) {
-        const s = active[i], d = Math.hypot(cen[f * 3] - s.x, cen[f * 3 + 1] - s.y, cen[f * 3 + 2] - s.z), reach = s.r * 1.5 + 0.15;
-        if (d < reach) { const t = 1 - d / reach; const v = t * t * (3 - 2 * t); if (v > w) w = v; }
+    const colA = b.geo.getAttribute('color'), n = colA.count;
+    for (let i = 0; i < n; i++) {
+      const btn = b.m.b[b.faceOf[i]];
+      let lit = false;
+      if (btn >= 0) {
+        // the front corner faces are bumper and trigger together (4,5 and 6,7)
+        const want = glowAll || glowSet.has(btn) || ((btn === 4 && glowSet.has(6)) || (btn === 5 && glowSet.has(7)));
+        lit = want;
       }
-      const r = base.r + (hot.r - base.r) * w, g = base.g + (hot.g - base.g) * w, bl = base.b + (hot.b - base.b) * w, o = f * 9;
-      arr[o] = r; arr[o + 1] = g; arr[o + 2] = bl; arr[o + 3] = r; arr[o + 4] = g; arr[o + 5] = bl; arr[o + 6] = r; arr[o + 7] = g; arr[o + 8] = bl;
+      const c = lit ? COL.glow : COL.body;
+      colA.setXYZ(i, c.r, c.g, c.b);
     }
     colA.needsUpdate = true;
   }
   let current = null, which = 'dualsense';
   async function use(name) {
     if (!models[name]) {
-      try { models[name] = decode(await fetch('models/' + (name === 'xbox' ? 'xbox-one' : name) + '.vmd').then(r => r.arrayBuffer())); } catch (e) { return; }
+      try { models[name] = await fetch('models-' + name + '.json').then(r => r.json()); } catch (e) { return; }
     }
     which = name;
     if (current) group.remove(current.g);

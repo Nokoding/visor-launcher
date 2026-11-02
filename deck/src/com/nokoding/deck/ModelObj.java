@@ -103,7 +103,7 @@ final class ModelObj {
 
     static volatile Opener bundled;
     /** Setup, PAD, 3D MODEL DETAIL: false = every triangle of the shipped model, true = the 12,000 triangle version. */
-    static volatile boolean lightDetail;
+    static volatile boolean lightDetail = true;
     static final int MAX_VMD_TRIS = 250000;
 
     /** The name of the shipped model file: dualsense.vmd, xbox-one.vmd, or the -light version. */
