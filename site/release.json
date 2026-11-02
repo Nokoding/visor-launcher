@@ -1,7 +1,7 @@
 {
   "version": "2.19-beta",
   "tag": "v2.19-beta",
-  "size_kb": 685,
+  "size_kb": 869,
   "url": "https://github.com/Nokoding/visor-launcher/releases",
   "note": "The size is of a build made from this tree. The release page shows the exact file and its SHA-256."
 }
