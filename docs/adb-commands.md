@@ -273,7 +273,3 @@ adb shell cmd role get-role-holders android.app.role.HOME
 ```
 
 The first reads the report that Setup, PAD, Controller report writes. The others check that Visor is installed and who has the home role.
-
-## Speeding up the box
-
-The list of apps that were turned off on the onn box, and the commands to turn each back on, are in [guide-termux.md](guide-termux.md). They are not part of Visor and `setup-all.sh` does not touch them.

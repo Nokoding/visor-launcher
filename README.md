@@ -2,9 +2,15 @@
 
 **The Android launcher for gamers**
 
-> Public beta. This is a first skeleton of the public repository. The full README, the install guides, the FAQ and the website come in the next pushes. See [KNOWN-ISSUES.md](KNOWN-ISSUES.md) for what is not verified.
+> Public beta. The full README with pictures comes in the next push. Start here: [I use a laptop](docs/guide-laptop.md) or [I use only my phone](docs/guide-termux.md). Questions: [FAQ](docs/faq.md). What is not verified: [KNOWN-ISSUES.md](KNOWN-ISSUES.md).
 
 Visor Launcher is a launcher for Android TV and Google TV boxes with a game controller in mind. It has no INTERNET permission.
+
+## Guides
+
+- [docs/guide-laptop.md](docs/guide-laptop.md): install with a Windows, macOS or Linux computer.
+- [docs/guide-termux.md](docs/guide-termux.md): install with only an Android phone.
+- [docs/faq.md](docs/faq.md): the FAQ.
 
 ## Documents
 
