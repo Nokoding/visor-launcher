@@ -102,19 +102,63 @@ final class ModelObj {
     interface Opener { java.io.InputStream open(String name) throws IOException; }
 
     static volatile Opener bundled;
+    /** Setup, PAD, 3D MODEL DETAIL: false = every triangle of the shipped model, true = the 12,000 triangle version. */
+    static volatile boolean lightDetail;
+    static final int MAX_VMD_TRIS = 250000;
 
-    /** The model that ships inside the app for this pad (assets/models), or null. */
-    static ControllerModel loadBundled(int padType) {
+    /** The name of the shipped model file: dualsense.vmd, xbox-one.vmd, or the -light version. */
+    static String bundledName(int layout, boolean light) {
+        String n = fileFor(layout);
+        if (n == null) return null;
+        return n.substring(0, n.length() - 4) + (light ? "-light" : "") + ".vmd";
+    }
+
+    /**
+     * The model that ships inside the app (assets/models, the compact VMD format), or null. VMD: "VMD1", then the
+     * number of vertices and of triangles (little endian ints), the size of one unit in cm (float), the vertices as 16
+     * bit integers, the triangles as 16 bit indices and one byte per triangle (a PadTest button number, 255 for none).
+     * Reading is a few array copies, so it is fast even for 100,000 triangles.
+     */
+    static ControllerModel loadBundled(int padType) { return loadBundled(padType, lightDetail); }
+
+    static ControllerModel loadBundled(int padType, boolean light) {
         Opener o = bundled;
-        String name = fileFor(PadTest.layout(padType));
+        String name = bundledName(PadTest.layout(padType), light);
         if (o == null || name == null) return null;
         try (java.io.InputStream in = o.open(name)) {
-            java.io.ByteArrayOutputStream bo = new java.io.ByteArrayOutputStream();
-            byte[] buf = new byte[16384];
+            java.io.ByteArrayOutputStream bo = new java.io.ByteArrayOutputStream(1 << 20);
+            byte[] buf = new byte[65536];
             int r, total = 0;
-            while ((r = in.read(buf)) > 0) { total += r; if (total > MAX_BYTES) return null; bo.write(buf, 0, r); }
-            return parse(padType, new String(bo.toByteArray(), "UTF-8"));
+            while ((r = in.read(buf)) > 0) { total += r; if (total > 16 * 1024 * 1024) return null; bo.write(buf, 0, r); }
+            return parseVmd(padType, bo.toByteArray());
         } catch (IOException | RuntimeException e) {
+            return null;
+        }
+    }
+
+    /** Reads VMD bytes. Never throws. @return null for anything that is not a good model. */
+    static ControllerModel parseVmd(int padType, byte[] d) {
+        try {
+            if (d == null || d.length < 16 || d[0] != 'V' || d[1] != 'M' || d[2] != 'D' || d[3] != '1') return null;
+            java.nio.ByteBuffer b = java.nio.ByteBuffer.wrap(d).order(java.nio.ByteOrder.LITTLE_ENDIAN);
+            b.position(4);
+            int nv = b.getInt(), nt = b.getInt();
+            float unit = b.getFloat();
+            if (nv < 4 || nv > 65535 || nt < 1 || nt > MAX_VMD_TRIS || !(unit > 0f && unit < 1f)) return null;
+            long need = 16L + nv * 6L + nt * 6L + nt;
+            if (need != d.length) return null;
+            float[] v = new float[nv * 3];
+            for (int i = 0; i < v.length; i++) v[i] = b.getShort() * unit;
+            int[][] f = new int[nt][];
+            for (int i = 0; i < nt; i++) {
+                int x = b.getShort() & 0xFFFF, y = b.getShort() & 0xFFFF, z = b.getShort() & 0xFFFF;
+                if (x >= nv || y >= nv || z >= nv) return null;
+                f[i] = new int[]{x, y, z};
+            }
+            int[] bt = new int[nt];
+            for (int i = 0; i < nt; i++) { int k = b.get() & 0xFF; bt[i] = k < PadTest.COUNT ? k : -1; }
+            return new ControllerModel(padType, v, f, bt);
+        } catch (RuntimeException e) {
             return null;
         }
     }
@@ -150,6 +194,6 @@ final class ModelObj {
         if (n == null) return "BUILT-IN MODEL";
         if (m != null) return "YOUR MODEL " + n.toUpperCase(Locale.ROOT) + " (" + m.faces.length + " TRIANGLES)";
         ControllerModel b = loadBundled(padType);
-        return b != null ? "BUNDLED MODEL (" + b.faces.length + " TRIANGLES)" : "BUILT-IN MODEL";
+        return b != null ? "BUNDLED MODEL (" + b.faces.length + " TRIANGLES)" + (lightDetail ? ", LIGHT" : "") : "BUILT-IN MODEL";
     }
 }

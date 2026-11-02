@@ -176,6 +176,7 @@ final class RowHelp {
         h("PLAYER LEDS", "Sets what the controller's five small lights show: OFF, WHEEL POSITION, BATTERY LEVEL or a LOCK-ON FLASH.");
         h("PLAYER LEDS STATUS", "Shows whether the controller's player lights can be controlled.");
         h("GAMEPAD TEST", "Opens a full screen check that lights each button as you press it, in a FULL or QUICK mode.");
+        h("3D MODEL DETAIL", "FULL draws every triangle of the controller model in the gyro test, LIGHT draws a 12,000 triangle version that is easier on a slow box.");
         h("GYRO TEST", "Opens a 3D controller that turns with your real one, so you can see the motion sensor work.");
         h("GYRO CALIBRATION", "Walks you through three steps that measure the sensor's resting error and which way its axes point.");
         h("CALIBRATION", "Shows the saved gyro calibration for the connected controller.");

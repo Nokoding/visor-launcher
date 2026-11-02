@@ -2,6 +2,12 @@
 
 Visor Launcher was developed privately as "Deck" until this public beta. Versions below are the internal numbers.
 
+## 2.20-beta
+
+- The controller models now keep every triangle of the originals: 111,676 for the DualSense and 43,119 for the Xbox pad (2.19-beta had cut them to 12,000). They are stored in a compact binary format (VMD), and the drawing code works out each face's direction once, not every frame. The app is about 0.9 MB bigger.
+- New Setup row 3D MODEL DETAIL: FULL (every triangle, the default) or LIGHT (12,000 triangles) in case the box stutters. Not tested on a real TV yet.
+- The website shows the same full detail models, with smooth shading and a soft glow on the pressed button.
+
 ## 2.19-beta
 
 - Detailed 3D models of a DualSense and an Xbox One style pad in the gyro test (12,000 triangles each, CC BY 4.0, credited in the README and NOTICE). Your own OBJ files still win, and the old hand-made shapes stay as a last resort.

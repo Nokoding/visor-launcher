@@ -675,6 +675,7 @@ public final class HomeActivity extends Activity implements Engine.Host, IconCac
         showAll = prefs.getBoolean("showAll", false);
         statsOn = prefs.getBoolean("stats", true);
         gyroOn = prefs.getBoolean("gyro", true);
+        ModelObj.lightDetail = prefs.getBoolean("modelLight", false);   // 2.18: full detail unless the user chose LIGHT
         panFollow = !"opposite".equals(prefs.getString("panDir", "follow"));
         stickRight = !"left".equals(prefs.getString("stick", "right"));
         volume = Math.max(0, Math.min(100, prefs.getInt("volume", 70)));
@@ -3285,6 +3286,11 @@ public final class HomeActivity extends Activity implements Engine.Host, IconCac
         p.add(pls);
         p.add(new Panel.Row("GAMEPAD TEST").sub().ok(this::openPadTestChooser));
         p.add(new Panel.Row("GYRO TEST").sub().ok(this::openGyroTest));
+        final Panel.Row md = p.add(new Panel.Row("3D MODEL DETAIL").values(ModelObj.lightDetail ? 1 : 0, "FULL (EVERY TRIANGLE)", "LIGHT (12,000 TRIANGLES)"));
+        md.change(() -> {
+            ModelObj.lightDetail = md.sel == 1;
+            prefs.edit().putBoolean("modelLight", ModelObj.lightDetail).apply();
+        });
         p.add(new Panel.Row("GYRO CALIBRATION").sub().ok(() -> openGyroCal(false)));
         final Panel.Row calSt = p.add(new Panel.Row("CALIBRATION").two(calStore.status(padId)));
         p.add(new Panel.Row("RESET CALIBRATION").danger().confirm("PRESS OK AGAIN TO CLEAR IT").ok(() -> {

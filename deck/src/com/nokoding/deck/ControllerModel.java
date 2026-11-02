@@ -31,6 +31,8 @@ final class ControllerModel {
     final int[] part;
     /** 2.17: true when the model was read from a file in the models folder. */
     boolean fromFile;
+    /** 2.18, models from a file only: the normal and the centre of every triangle in model space, worked out once. */
+    float[] faceN, faceC;
     /** Index of the body top cap. Group 1 is drawn after the body only while this face looks at the camera. */
     final int topFace;
     final int vertexCount;
@@ -145,6 +147,15 @@ final class ControllerModel {
             if (score > bestY) { bestY = score; best = i; }
         }
         topFace = best;
+        faceN = new float[f.length * 3];
+        faceC = new float[f.length * 3];
+        for (int i = 0; i < f.length; i++) {
+            normal(v, f[i], n);
+            float len = (float) Math.sqrt(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);
+            if (len > 0) { n[0] /= len; n[1] /= len; n[2] /= len; }
+            faceN[i * 3] = n[0]; faceN[i * 3 + 1] = n[1]; faceN[i * 3 + 2] = n[2];
+            for (int k = 0; k < 3; k++) faceC[i * 3 + k] = (v[f[i][0] * 3 + k] + v[f[i][1] * 3 + k] + v[f[i][2] * 3 + k]) * (1f / 3f);
+        }
     }
 
     /**

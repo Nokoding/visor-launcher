@@ -31,7 +31,7 @@ final class ControllerDraw {
         ControllerModel m = model;
         int nv = m.vertexCount, nf = m.faces.length;
         if (tv.length < nv * 3) { tv = new float[nv * 3]; sv = new float[nv * 2]; }
-        if (depth.length < nf) { depth = new float[nf]; facing = new float[nf]; order0 = new int[nf]; order1 = new int[nf]; }
+        if (!m.fromFile && depth.length < nf) { depth = new float[nf]; facing = new float[nf]; order0 = new int[nf]; order1 = new int[nf]; }
         Mat3D.euler(yaw, pitch, roll, rot, t1, t2);
         Mat3D.mul(view, rot, mvp);
         float[] v = m.verts;
@@ -62,53 +62,76 @@ final class ControllerDraw {
         else { faces(c, t, order1, n1, fill, line, path); faces(c, t, order0, n0, fill, line, path); }
     }
 
-    // ---- 2.18: real models (a few thousand triangles). One drawVertices call, a counting sort, nothing allocated per frame.
+    // ---- 2.18: real models (up to 100,000 triangles). The triangle normals and centres are worked out once when the
+    // model loads, so a frame costs a few multiplications per triangle: no square roots, no allocation. The visible
+    // triangles are sorted far to near with a counting sort and drawn in a few drawVertices calls.
     private float[] vpos = new float[0];
     private int[] vcol = new int[0];
-    private int[] bucketCount = new int[SORT_BUCKETS + 1], sortTmp = new int[0];
-    private static final int SORT_BUCKETS = 2048;
+    private int[] bucketCount = new int[SORT_BUCKETS + 1], sortTmp = new int[0], sortIdx = new int[0];
+    private static final int SORT_BUCKETS = 4096, SHADES = 64, BATCH_TRIS = 10000;
+    private final int[] shadeLut = new int[SHADES];
 
     private void drawMesh(Canvas c, Ui.Theme t, ControllerModel m, Paint fill) {
-        int nf = m.faces.length;
+        final int nf = m.faces.length;
+        final float[] fn = m.faceN, fc = m.faceC;
+        // the camera and a light, in model space (the matrix is a rotation, so its transpose is its inverse)
+        final float k = DIST / S, invK = S / DIST;
+        final float cx = mvp[6] * k, cy = mvp[7] * k, cz = mvp[8] * k;
+        // light from the upper left front, fixed on the screen
+        final float lx = mvp[0] * -0.35f + mvp[3] * 0.55f + mvp[6] * 0.75f;
+        final float ly = mvp[1] * -0.35f + mvp[4] * 0.55f + mvp[7] * 0.75f;
+        final float lz = mvp[2] * -0.35f + mvp[5] * 0.55f + mvp[8] * 0.75f;
+        final float zx = mvp[6] * S, zy = mvp[7] * S, zz = mvp[8] * S;   // view space depth of a model point
+        for (int i = 0; i < SHADES; i++) {
+            float f = i / (float) (SHADES - 1);
+            shadeLut[i] = Ui.mix(Ui.mix(t.panel, t.b, 0.10f + 0.66f * f), t.a, (1f - f) * 0.12f);
+        }
+        if (sortIdx.length < nf) { sortIdx = new int[nf]; sortTmp = new int[nf]; depth = new float[nf]; facing = new float[nf]; }
         int n = 0;
         float dmin = Float.MAX_VALUE, dmax = -Float.MAX_VALUE;
         for (int f = 0; f < nf; f++) {
-            int[] fc = m.faces[f];
-            int a = fc[0] * 3, b = fc[1] * 3, d = fc[2] * 3;
-            float ax = tv[a], ay = tv[a + 1], az = tv[a + 2];
-            float ux = tv[b] - ax, uy = tv[b + 1] - ay, uz = tv[b + 2] - az, wx = tv[d] - ax, wy = tv[d + 1] - ay, wz = tv[d + 2] - az;
-            float nx = uy * wz - uz * wy, ny = uz * wx - ux * wz, nz = ux * wy - uy * wx;
-            float zx = (ax + tv[b] + tv[d]) * (1f / 3f), zy = (ay + tv[b + 1] + tv[d + 1]) * (1f / 3f), zz = (az + tv[b + 2] + tv[d + 2]) * (1f / 3f);
-            float vx = -zx, vy = -zy, vz = DIST - zz;
-            float nl = (float) Math.sqrt(nx * nx + ny * ny + nz * nz), vl = (float) Math.sqrt(vx * vx + vy * vy + vz * vz);
-            float fa = nl > 0 && vl > 0 ? (nx * vx + ny * vy + nz * vz) / (nl * vl) : 0f;
-            facing[f] = fa;
-            depth[f] = vl;
-            if (fa <= 0.001f) continue;
-            order0[n++] = f;
-            if (vl < dmin) dmin = vl;
-            if (vl > dmax) dmax = vl;
+            int o = f * 3;
+            float nx = fn[o], ny = fn[o + 1], nz = fn[o + 2];
+            float vx = cx - fc[o], vy = cy - fc[o + 1], vz = cz - fc[o + 2];
+            float dot = nx * vx + ny * vy + nz * vz;
+            if (dot <= 0f) continue;
+            float lit = nx * lx + ny * ly + nz * lz;
+            float shade = 0.55f * Math.min(1f, dot * invK) + 0.45f * (lit > 0f ? lit : 0f);
+            facing[f] = shade;
+            float d = -(fc[o] * zx + fc[o + 1] * zy + fc[o + 2] * zz);   // larger = farther
+            depth[f] = d;
+            sortIdx[n++] = f;
+            if (d < dmin) dmin = d;
+            if (d > dmax) dmax = d;
         }
         if (n == 0) return;
-        // far first, by a counting sort over the depth range (an insertion sort would be far too slow for thousands of faces)
-        if (sortTmp.length < n) sortTmp = new int[nf];
         java.util.Arrays.fill(bucketCount, 0);
-        float span = Math.max(1e-3f, dmax - dmin), k = (SORT_BUCKETS - 1) / span;
-        for (int i = 0; i < n; i++) bucketCount[SORT_BUCKETS - 1 - (int) ((depth[order0[i]] - dmin) * k)]++;
+        final float span = Math.max(1e-3f, dmax - dmin), kk = (SORT_BUCKETS - 1) / span;
+        for (int i = 0; i < n; i++) bucketCount[SORT_BUCKETS - 1 - (int) ((depth[sortIdx[i]] - dmin) * kk)]++;
         int run = 0;
         for (int i = 0; i < SORT_BUCKETS; i++) { int cnt = bucketCount[i]; bucketCount[i] = run; run += cnt; }
-        for (int i = 0; i < n; i++) { int f = order0[i]; sortTmp[bucketCount[SORT_BUCKETS - 1 - (int) ((depth[f] - dmin) * k)]++] = f; }
-        if (vpos.length < n * 6) { vpos = new float[nf * 6]; vcol = new int[nf * 3]; }
+        for (int i = 0; i < n; i++) { int f = sortIdx[i]; sortTmp[bucketCount[SORT_BUCKETS - 1 - (int) ((depth[f] - dmin) * kk)]++] = f; }
+        if (vpos.length < BATCH_TRIS * 6) { vpos = new float[BATCH_TRIS * 6]; vcol = new int[BATCH_TRIS * 3]; }
+        fill.setStyle(Paint.Style.FILL);
+        int inBatch = 0;
         for (int i = 0; i < n; i++) {
             int f = sortTmp[i];
-            int[] fc = m.faces[f];
-            for (int q = 0; q < 3; q++) { vpos[i * 6 + q * 2] = sv[fc[q] * 2]; vpos[i * 6 + q * 2 + 1] = sv[fc[q] * 2 + 1]; }
-            float fa = facing[f];
-            int col = Ui.mix(Ui.mix(t.panel, t.b, 0.10f + 0.62f * fa), t.a, (1f - fa) * 0.14f);
-            vcol[i * 3] = col; vcol[i * 3 + 1] = col; vcol[i * 3 + 2] = col;
+            int[] fv = m.faces[f];
+            int o = inBatch * 6;
+            int a = fv[0] * 2, b2 = fv[1] * 2, d2 = fv[2] * 2;
+            vpos[o] = sv[a]; vpos[o + 1] = sv[a + 1];
+            vpos[o + 2] = sv[b2]; vpos[o + 3] = sv[b2 + 1];
+            vpos[o + 4] = sv[d2]; vpos[o + 5] = sv[d2 + 1];
+            float sh = facing[f];
+            int col = shadeLut[sh <= 0f ? 0 : (sh >= 1f ? SHADES - 1 : (int) (sh * (SHADES - 1)))];
+            int q = inBatch * 3;
+            vcol[q] = col; vcol[q + 1] = col; vcol[q + 2] = col;
+            if (++inBatch == BATCH_TRIS) {
+                c.drawVertices(Canvas.VertexMode.TRIANGLES, inBatch * 6, vpos, 0, null, 0, vcol, 0, null, 0, 0, fill);
+                inBatch = 0;
+            }
         }
-        fill.setStyle(Paint.Style.FILL);
-        c.drawVertices(Canvas.VertexMode.TRIANGLES, n * 6, vpos, 0, null, 0, vcol, 0, null, 0, 0, fill);
+        if (inBatch > 0) c.drawVertices(Canvas.VertexMode.TRIANGLES, inBatch * 6, vpos, 0, null, 0, vcol, 0, null, 0, 0, fill);
     }
 
     private void faces(Canvas c, Ui.Theme t, int[] order, int n, Paint fill, Paint line, Path path) {

@@ -39,7 +39,7 @@ Visor Launcher is a home screen for Android TV and Google TV boxes, made for peo
 
 **Stick volume and touchpad volume.** Hold a key and spin the right stick, or drag a finger on the DualSense touchpad, to change the volume. [docs/stick-volume.md](docs/stick-volume.md), [docs/touchpad-volume.md](docs/touchpad-volume.md).
 
-**The gamepad test and the gyro test.** Check every button, stick, trigger and the rumble of a controller, with a checklist and a small report. Hold the circle button to leave. The gyro test shows a detailed 3D controller that turns with yours, and accepts your own models. The first time you connect a controller with a gyro, Visor opens it once with a short welcome. [docs/gamepad-test.md](docs/gamepad-test.md), [docs/gyro-models.md](docs/gyro-models.md).
+**The gamepad test and the gyro test.** Check every button, stick, trigger and the rumble of a controller, with a checklist and a small report. Hold the circle button to leave. The gyro test shows a detailed 3D controller (every triangle of the original model) that turns with yours, with a LIGHT setting for a slow box, and accepts your own models. The first time you connect a controller with a gyro, Visor opens it once with a short welcome. [docs/gamepad-test.md](docs/gamepad-test.md), [docs/gyro-models.md](docs/gyro-models.md).
 
 ![The gamepad test](docs/images/gamepad-test.webp)
 
@@ -141,7 +141,7 @@ Bug reports with your TV, controller and steps are the most useful thing right n
 
 ## Credits
 
-- The 3D controller models in the gyro test: "Playstation 5 Dualsense" by AHarmlessPotato (https://skfb.ly/opKOx) and "Xbox Inalambric Controller (White)" by Chistodrako._. (https://skfb.ly/o6Kox), both under Creative Commons Attribution 4.0 (https://creativecommons.org/licenses/by/4.0/). They were reduced, rescaled and stripped of textures and logos for this project.
+- The 3D controller models in the gyro test: "Playstation 5 Dualsense" by AHarmlessPotato (https://skfb.ly/opKOx) and "Xbox Inalambric Controller (White)" by Chistodrako._. (https://skfb.ly/o6Kox), both under Creative Commons Attribution 4.0 (https://creativecommons.org/licenses/by/4.0/). They were rescaled and stripped of textures, and the small logos were flattened, for this project. All triangles are kept.
 - Fonts: Orbitron, Rajdhani and Share Tech Mono, SIL Open Font License.
 
 ## Licence

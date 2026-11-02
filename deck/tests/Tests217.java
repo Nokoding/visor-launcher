@@ -331,53 +331,72 @@ final class Tests217 {
     }
 
     static void bundledModels() {
-        section("2.18 the real controller models that ship in the app (assets/models)");
+        section("2.18 the real controller models that ship in the app (assets/models, VMD)");
         String dir = System.getProperty("deck.src");
         if (dir == null) return;
-        String[] names = {"dualsense.obj", "xbox-one.obj"};
         int[] pads = {PadTest.PLAYSTATION, PadTest.XBOX};
+        String[] names = {"dualsense", "xbox-one"};
+        int[] minTris = {100000, 40000};
         final java.io.File assets = new java.io.File(dir, "../../../../assets/models");
         for (int i = 0; i < 2; i++) {
-            try {
-                String text = new String(java.nio.file.Files.readAllBytes(new java.io.File(assets, names[i]).toPath()), java.nio.charset.StandardCharsets.UTF_8);
-                ControllerModel m = ModelObj.parse(pads[i], text);
-                check(m != null && m.fromFile, names[i] + " reads");
-                if (m == null) continue;
-                check(m.faces.length >= 8000 && m.faces.length <= ModelObj.MAX_TRIS, names[i] + " keeps its detail: " + m.faces.length + " triangles");
-                float minX = 1e9f, maxX = -1e9f, minY = 1e9f, maxY = -1e9f, minZ = 1e9f, maxZ = -1e9f;
-                for (int v = 0; v < m.vertexCount; v++) {
-                    minX = Math.min(minX, m.verts[v * 3]); maxX = Math.max(maxX, m.verts[v * 3]);
-                    minY = Math.min(minY, m.verts[v * 3 + 1]); maxY = Math.max(maxY, m.verts[v * 3 + 1]);
-                    minZ = Math.min(minZ, m.verts[v * 3 + 2]); maxZ = Math.max(maxZ, m.verts[v * 3 + 2]);
+            for (int light = 0; light < 2; light++) {
+                String file = names[i] + (light == 1 ? "-light" : "") + ".vmd";
+                try {
+                    byte[] data = java.nio.file.Files.readAllBytes(new java.io.File(assets, file).toPath());
+                    ControllerModel m = ModelObj.parseVmd(pads[i], data);
+                    check(m != null && m.fromFile && m.faceN != null, file + " reads");
+                    if (m == null) continue;
+                    if (light == 0) check(m.faces.length >= minTris[i], file + " keeps every triangle of the source: " + m.faces.length);
+                    else check(m.faces.length >= 11000 && m.faces.length <= 12100, file + " is the light version: " + m.faces.length + " triangles");
+                    float minX = 1e9f, maxX = -1e9f, minY = 1e9f, maxY = -1e9f, minZ = 1e9f, maxZ = -1e9f;
+                    for (int v = 0; v < m.vertexCount; v++) {
+                        minX = Math.min(minX, m.verts[v * 3]); maxX = Math.max(maxX, m.verts[v * 3]);
+                        minY = Math.min(minY, m.verts[v * 3 + 1]); maxY = Math.max(maxY, m.verts[v * 3 + 1]);
+                        minZ = Math.min(minZ, m.verts[v * 3 + 2]); maxZ = Math.max(maxZ, m.verts[v * 3 + 2]);
+                    }
+                    float w = maxX - minX, th = maxY - minY, dp = maxZ - minZ;
+                    check(w > 15f && w < 16.6f && th > 6f && th < 9.5f && dp > 8.5f && dp < 11.5f, file + " has the real size in cm: " + w + " wide, " + th + " thick, " + dp + " deep");
+                    check(Math.abs((minX + maxX) / 2) < 0.2f && Math.abs((minY + maxY) / 2) < 0.2f && Math.abs((minZ + maxZ) / 2) < 0.2f, file + " is centred");
+                    java.util.HashSet<Integer> ids = new java.util.HashSet<>();
+                    for (int b : m.button) if (b >= 0) ids.add(b);
+                    check(ids.size() >= 10, file + " tags the faces of its buttons (" + ids.size() + " different buttons)");
+                    int up = 0, upN = 0, down = 0, downN = 0;
+                    for (int f = 0; f < m.faces.length; f++) {
+                        float cy = m.faceC[f * 3 + 1];
+                        if (cy > maxY - 0.4f) { upN++; if (m.faceN[f * 3 + 1] > 0) up++; }
+                        if (cy < minY + 0.4f) { downN++; if (m.faceN[f * 3 + 1] < 0) down++; }
+                    }
+                    check(upN > 20 && up > upN * 0.5 && downN > 20 && down > downN * 0.5, file + " faces point outward (" + up + "/" + upN + " on top, " + down + "/" + downN + " underneath)");
+                    float len = 0;
+                    for (int f = 0; f < Math.min(2000, m.faces.length); f++) len += Math.abs(m.faceN[f * 3] * m.faceN[f * 3] + m.faceN[f * 3 + 1] * m.faceN[f * 3 + 1] + m.faceN[f * 3 + 2] * m.faceN[f * 3 + 2] - 1f);
+                    check(len < 40f, file + ": the stored face normals have length 1");
+                    check(data.length < (light == 0 ? 1700 : 300) * 1024, file + " stays small: " + data.length / 1024 + " KB");
+                } catch (java.io.IOException e) {
+                    check(false, "reading " + file + " failed: " + e);
                 }
-                float w = maxX - minX, th = maxY - minY, dp = maxZ - minZ;
-                check(w > 15f && w < 16.6f && th > 6f && th < 9.5f && dp > 8.5f && dp < 11.5f, names[i] + " has the real size in cm: " + w + " wide, " + th + " thick, " + dp + " deep");
-                check(Math.abs((minX + maxX) / 2) < 0.2f && Math.abs((minY + maxY) / 2) < 0.2f && Math.abs((minZ + maxZ) / 2) < 0.2f, names[i] + " is centred");
-                java.util.HashSet<Integer> ids = new java.util.HashSet<>();
-                for (int b : m.button) if (b >= 0) ids.add(b);
-                check(ids.size() >= 10, names[i] + " tags the faces of its buttons (" + ids.size() + " different buttons)");
-                // faces at the very top look up, faces at the very bottom look down (the winding was fixed for the app's culling)
-                float[] nrm = new float[3];
-                int up = 0, upN = 0, down = 0, downN = 0;
-                for (int f = 0; f < m.faces.length; f++) {
-                    float cy = (m.verts[m.faces[f][0] * 3 + 1] + m.verts[m.faces[f][1] * 3 + 1] + m.verts[m.faces[f][2] * 3 + 1]) / 3f;
-                    ControllerModel.normal(m.verts, m.faces[f], nrm);
-                    if (cy > maxY - 0.4f) { upN++; if (nrm[1] > 0) up++; }
-                    if (cy < minY + 0.4f) { downN++; if (nrm[1] < 0) down++; }
-                }
-                check(upN > 20 && up > upN * 0.5 && downN > 20 && down > downN * 0.5, names[i] + " faces point outward (" + up + "/" + upN + " on top, " + down + "/" + downN + " underneath)");
-                final java.io.File af = assets;
-                ModelObj.bundled = name -> new java.io.FileInputStream(new java.io.File(af, name));
-                ControllerModel b = ModelObj.loadBundled(pads[i]);
-                check(b != null && b.faces.length == m.faces.length && ModelObj.forType(null, pads[i]).fromFile, names[i] + " loads through the app's opener, and forType prefers it to the hand made model");
-                check(ModelObj.describe(null, pads[i]).startsWith("BUNDLED MODEL"), "the status text says which model is used");
-                ModelObj.bundled = null;
-                check(!ModelObj.forType(null, pads[i]).fromFile, "without the opener the hand made model is the last resort");
-            } catch (java.io.IOException e) {
-                check(false, "reading " + names[i] + " failed: " + e);
             }
+            final java.io.File af = assets;
+            ModelObj.bundled = name -> new java.io.FileInputStream(new java.io.File(af, name));
+            ModelObj.lightDetail = false;
+            ControllerModel full = ModelObj.loadBundled(pads[i]);
+            ModelObj.lightDetail = true;
+            ControllerModel lite = ModelObj.loadBundled(pads[i]);
+            ModelObj.lightDetail = false;
+            check(full != null && lite != null && full.faces.length > lite.faces.length * 3, names[i] + ": the detail switch picks the full or the light model");
+            check(ModelObj.forType(null, pads[i]).fromFile && ModelObj.describe(null, pads[i]).startsWith("BUNDLED MODEL"), names[i] + ": forType prefers the shipped model to the hand made one, and the status says so");
+            ModelObj.bundled = null;
+            check(!ModelObj.forType(null, pads[i]).fromFile, names[i] + ": without the opener the hand made model is the last resort");
         }
-        check(new java.io.File(assets, "dualsense.obj").length() < 450 * 1024 && new java.io.File(assets, "xbox-one.obj").length() < 450 * 1024, "each model file stays under 450 KB");
+        check(ModelObj.parseVmd(PadTest.XBOX, null) == null && ModelObj.parseVmd(PadTest.XBOX, new byte[10]) == null && ModelObj.parseVmd(PadTest.XBOX, "VMD1xxxxxxxxxxxxxxxx".getBytes()) == null, "bad VMD bytes give null");
+        byte[] ok = new byte[16 + 4 * 6 + 1 * 6 + 1];
+        ok[0] = 'V'; ok[1] = 'M'; ok[2] = 'D'; ok[3] = '1';
+        java.nio.ByteBuffer bb = java.nio.ByteBuffer.wrap(ok).order(java.nio.ByteOrder.LITTLE_ENDIAN);
+        bb.position(4); bb.putInt(4); bb.putInt(1); bb.putFloat(0.0005f);
+        bb.position(16 + 24); bb.putShort((short) 0); bb.putShort((short) 1); bb.putShort((short) 2);
+        check(ModelObj.parseVmd(PadTest.XBOX, ok) != null, "a tiny good VMD reads");
+        bb.position(16 + 24); bb.putShort((short) 0); bb.putShort((short) 1); bb.putShort((short) 9);
+        check(ModelObj.parseVmd(PadTest.XBOX, ok) == null, "a triangle that uses a missing vertex is refused");
+        check(ModelObj.parseVmd(PadTest.XBOX, java.util.Arrays.copyOf(ok, ok.length - 1)) == null, "a cut VMD is refused");
     }
 
     static void gyroIntro() {

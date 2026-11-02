@@ -2,20 +2,22 @@
 
 New in 2.17. The gyro test draws a low-poly controller that turns with the real one. It is built in code, so there is nothing to install. You can also replace it with your own model.
 
-## The models that ship in the app (2.18)
+## The models that ship in the app (2.18, full detail since 2.19)
 
-Since 2.18 the gyro test draws two detailed models that ship inside the app (`deck/assets/models`):
+Since 2.18 the gyro test draws two detailed models that ship inside the app (`deck/assets/models`). Since 2.19 they keep every triangle of the originals:
 
-| Controller | Model | Author | Licence |
-|---|---|---|---|
-| DualSense style | "Playstation 5 Dualsense", https://skfb.ly/opKOx | AHarmlessPotato | CC BY 4.0 |
-| Xbox style | "Xbox Inalambric Controller (White)", https://skfb.ly/o6Kox | Chistodrako._. | CC BY 4.0 |
+| Controller | Model | Author | Licence | Triangles |
+|---|---|---|---|---|
+| DualSense style | "Playstation 5 Dualsense", https://skfb.ly/opKOx | AHarmlessPotato | CC BY 4.0 | 111,676 |
+| Xbox style | "Xbox Inalambric Controller (White)", https://skfb.ly/o6Kox | Chistodrako._. | CC BY 4.0 | 43,119 |
 
-What was done to them: they were scaled to the real width (160 mm for the DualSense, 152.9 mm for the Xbox One pad), turned to Visor's axes, joined into one piece, reduced from 111,676 and 43,119 triangles to 12,000 each with quadric decimation, their textures were dropped and the small embossed logos (the PlayStation symbol on the PS button, the Xbox lettering on the back) were flattened, so only the plain shape is used, and the faces were turned the right way round for drawing. The faces of the buttons are tagged in the file (`g b<N>` lines, N is a button number) for later use. The original models are not in this repository. Credit lines are in the NOTICE file and in the README.
+What was done to them: they were scaled to the real width (160 mm for the DualSense, 152.9 mm for the Xbox One pad), turned to the app's axes, joined into one piece, their textures were dropped and the small embossed logos (the PlayStation symbol on the PS button, the Xbox lettering on the back) were flattened, and the faces were turned the right way round for drawing. No triangles were removed from the full models. The faces of the buttons are tagged in the file for later use. The original files are not in this repository.
 
-The author of the DualSense model says there were no accurate blueprints, so it is close but not exact. The reduction keeps the shape, the sticks, the D-pad, the buttons and the touchpad slot, and loses fine surface detail such as the printed logos and the small texture bumps. Other controllers (and the Switch layout) use the DualSense model. The hand made shapes of 2.17 stay in the code as a last resort if a file cannot be read.
+The models are stored in a small binary format called VMD (`dualsense.vmd`, `xbox-one.vmd`): the points as 16 bit numbers in units of 0.005 mm, the triangles as 16 bit indexes, and one byte per triangle for the button it belongs to. That is 1.1 MB and 0.4 MB. Next to each there is a `-light.vmd` with 12,000 triangles, for a slow box. In Setup, the row 3D MODEL DETAIL switches between FULL (every triangle) and LIGHT (12,000 triangles). Full is the default.
 
-How it is drawn: one call per frame with all the visible triangles (Canvas drawVertices), sorted far to near with a counting sort, shaded flat from the camera direction with the theme colours. Nothing is allocated per frame. The test box has never run it, so smoothness there is not known. A model with this many triangles may show a wrong order of faces at some angles, because the app uses a painter's algorithm and not a depth buffer.
+Credit lines are in the NOTICE file and in the README. The author of the DualSense model says there were no accurate blueprints, so it is close but not exact. Other controllers (and the Switch layout) use the DualSense model. The hand made shapes of 2.17 stay in the code as a last resort if a file cannot be read.
+
+How it is drawn: one call per batch of 10,000 visible triangles (Canvas drawVertices), sorted far to near with a counting sort, shaded flat from the camera direction and one light with the theme colours. Normals and centres are worked out once when the model loads, and nothing is allocated per frame. The test box has never run it. Drawing 112,000 triangles every frame on a box with 1.4 GB of RAM may be slow, and nobody knows yet how slow. If it stutters, set 3D MODEL DETAIL to LIGHT. The app uses a painter's algorithm and not a depth buffer, so a model with this many triangles may show a wrong order of faces at some angles.
 
 The real sizes the models are built around (dimensions.com):
 
@@ -33,7 +35,7 @@ Put one OBJ file per controller in:
 /sdcard/Android/data/com.nokoding.deck/files/models/xbox-one.obj
 ```
 
-Visor makes the folder when it starts. From Termux: `bash deck/tools/install-model.sh TVIP:PORT dualsense.obj` (it checks the file first). Visor reads the file each time the gyro test opens, and it wins over the model that ships in the app, so there is no reload step.
+Visor makes the folder when it starts. From Termux: `bash deck/tools/install-model.sh TVIP:PORT dualsense.obj` (it checks the file first). Visor reads the file each time the gyro test opens, and it wins over the models that ship in the app, so there is no reload step.
 
 The format is a small part of Wavefront OBJ:
 
