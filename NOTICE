@@ -12,6 +12,10 @@ What is under which licence
     Rajdhani          (Indian Type Foundry)
     Share Tech Mono   (Carrois Apostrophe)
   The fonts are in deck/assets/fonts and in site/fonts.
+- The 3D controller models (deck/assets/models, site/models-*.json) are adapted from two models under Creative Commons Attribution 4.0:
+    "Playstation 5 Dualsense" by AHarmlessPotato, https://skfb.ly/opKOx
+    "Xbox Inalambric Controller (White)" by Chistodrako._., https://skfb.ly/o6Kox
+  Changes: scaled to real size, turned to the app's axes, joined, reduced to 12,000 triangles each, textures and logos removed.
 - three.js, if vendored in site/vendor, is MIT, see the header of that file.
 
 Trademarks
@@ -22,5 +26,5 @@ trademarks of their owners. They are used here as plain text names only, to say 
 Visor is not related to the Steam Deck, to the Valve handheld, or to any hardware or software that is
 also called Visor.
 
-No logos, icons or artwork of anyone else are in this project. The controller outlines and 3D models
-are drawn by the project (hand-written curves and low-poly shapes), not copied from any maker or website.
+No logos, icons or artwork of anyone else are in this project. The controller outlines in the gamepad test
+are hand-written curves of the project. The 3D models are the CC BY models credited above, with their textures and logos removed.

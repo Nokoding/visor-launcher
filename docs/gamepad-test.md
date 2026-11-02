@@ -38,7 +38,9 @@ Lots of TV boxes grab the PS or Guide button for themselves, and some never pass
 
 ## Gyro test
 
-New in 2.17: the 3D controller has grips, bumpers and triggers, and you can use your own model file, see [gyro-models.md](gyro-models.md).
+The first time the home screen shows with a controller that has a gyro connected, Visor opens this test once, with a two line welcome in place of the usual first line. It is asked once, and the first run tutorial goes first. Leave it with Back, B or EXIT like any test.
+
+The 3D controller is a detailed model of a DualSense or an Xbox One style pad (credits in [gyro-models.md](gyro-models.md)), and you can use your own model file.
 
 Setup, PAD, GYRO TEST. A low poly controller turns as your real one turns. It's drawn with plain Canvas: a PlayStation or Xbox shape (generic gets the PlayStation shape without the touchpad), neon outline, faces shaded by how much they face you.
 

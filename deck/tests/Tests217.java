@@ -15,6 +15,8 @@ final class Tests217 {
         themes();
         models();
         video();
+        bundledModels();
+        gyroIntro();
     }
 
     static void tutorialNeverTraps() {
@@ -265,7 +267,7 @@ final class Tests217 {
         String cube = "v -1 -1 -1\nv 1 -1 -1\nv 1 1 -1\nv -1 1 -1\nv -1 -1 1\nv 1 -1 1\nv 1 1 1\nv -1 1 1\n"
                 + "f 1 2 3 4\nf 5 8 7 6\nf 1 5 6 2\nf 3 7 8 4\nf 1 4 8 5\nf 2 6 7 3\n";
         ControllerModel m = ModelObj.parse(PadTest.PLAYSTATION, "# a cube\n" + cube);
-        check(m != null && m.fromFile && m.faces.length == 6 && m.vertexCount == 8 && m.topFace >= 0, "a good OBJ reads");
+        check(m != null && m.fromFile && m.faces.length == 12 && m.vertexCount == 8 && m.topFace >= 0, "a good OBJ reads");
         ControllerModel mm = ModelObj.parse(PadTest.XBOX, cube.replace("v -1 -1 -1", "v -100 -100 -100").replace("v 1 1 1", "v 100 100 100"));
         check(mm != null && Math.abs(mm.verts[0] + 10f) < 1e-3f && Math.abs(mm.verts[18] - 10f) < 1e-3f, "a model bigger than 40 is taken as millimetres");
         check(ModelObj.parse(PadTest.XBOX, cube.replace("f 1 2 3 4", "f 1/1/1 2/2/2 3/3/3 4/4/4")) != null, "slash indices use the first number");
@@ -276,20 +278,20 @@ final class Tests217 {
         check(allBad, "bad numbers, bad or missing indices, no faces, too big: all give null");
         StringBuilder many = new StringBuilder(cube);
         for (int i = 0; i < ModelObj.MAX_TRIS; i++) many.append("f 1 2 3\n");
-        check(ModelObj.parse(PadTest.XBOX, many.toString()) == null, "over 4000 triangles is refused");
+        check(ModelObj.parse(PadTest.XBOX, many.toString()) == null, "over the triangle cap is refused");
         StringBuilder verts = new StringBuilder();
         for (int i = 0; i < ModelObj.MAX_VERTS + 1; i++) verts.append("v 1 1 1\n");
-        check(ModelObj.parse(PadTest.XBOX, verts + "f 1 2 3\n") == null, "over 6000 vertices is refused");
+        check(ModelObj.parse(PadTest.XBOX, verts + "f 1 2 3\n") == null, "over the vertex cap is refused");
         check(ModelObj.fileFor(PadTest.PLAYSTATION).equals("dualsense.obj") && ModelObj.fileFor(PadTest.XBOX).equals("xbox-one.obj") && ModelObj.fileFor(PadTest.GENERIC) == null, "file names per controller");
         try {
             java.io.File dir = java.nio.file.Files.createTempDirectory("deckmodel").toFile();
             check(ModelObj.load(dir, PadTest.PLAYSTATION) == null && ModelObj.load(null, PadTest.PLAYSTATION) == null && ModelObj.forType(dir, PadTest.PLAYSTATION).faces.length > 20, "no file gives the built-in model");
             java.nio.file.Files.write(new java.io.File(dir, "dualsense.obj").toPath(), cube.getBytes("UTF-8"));
-            check(ModelObj.load(dir, PadTest.PLAYSTATION) != null && ModelObj.forType(dir, PadTest.PLAYSTATION).fromFile && !ModelObj.forType(dir, PadTest.XBOX).fromFile, "the file replaces only its own controller");
+            check(ModelObj.load(dir, PadTest.PLAYSTATION) != null && ModelObj.forType(dir, PadTest.PLAYSTATION).fromFile && !ModelObj.forType(dir, PadTest.XBOX).fromFile, "the file replaces only its own controller (no bundled opener set)");
             java.nio.file.Files.write(new java.io.File(dir, "xbox-one.obj").toPath(), "garbage".getBytes("UTF-8"));
             check(!ModelObj.forType(dir, PadTest.XBOX).fromFile, "a bad file falls back to the built-in model");
             java.nio.file.Files.write(new java.io.File(dir, "xbox-one.obj").toPath(), new byte[ModelObj.MAX_BYTES + 5]);
-            check(ModelObj.load(dir, PadTest.XBOX) == null, "a file over 400 KB is not read");
+            check(ModelObj.load(dir, PadTest.XBOX) == null, "a file over 1.5 MB is not read");
             for (java.io.File f : dir.listFiles()) f.delete();
             dir.delete();
         } catch (java.io.IOException e) {
@@ -326,5 +328,65 @@ final class Tests217 {
         check(bad1.error != null && bad2.error != null && bad3.error != null, "a video in an image pack, a picture as a video and a path in the name are refused");
         check(PackZip.WALLPAPERS.capFor("LOOP.MP4") == 40 * MB && PackZip.WALLPAPERS.capFor("a.png") == 8 * MB && PackZip.WALLPAPERS.totalFor(true) == 48 * MB && PackZip.WALLPAPERS.totalFor(false) == 24 * MB, "caps: 40 MB for an mp4, 8 MB for an image, 48 MB with a video, 24 MB without");
         check(PackZip.isMedia("loop.mp4", PackZip.WALLPAPERS) && !PackZip.isMedia("loop.mp4", PackZip.ICONS), "mp4 is a wallpaper file only");
+    }
+
+    static void bundledModels() {
+        section("2.18 the real controller models that ship in the app (assets/models)");
+        String dir = System.getProperty("deck.src");
+        if (dir == null) return;
+        String[] names = {"dualsense.obj", "xbox-one.obj"};
+        int[] pads = {PadTest.PLAYSTATION, PadTest.XBOX};
+        final java.io.File assets = new java.io.File(dir, "../../../../assets/models");
+        for (int i = 0; i < 2; i++) {
+            try {
+                String text = new String(java.nio.file.Files.readAllBytes(new java.io.File(assets, names[i]).toPath()), java.nio.charset.StandardCharsets.UTF_8);
+                ControllerModel m = ModelObj.parse(pads[i], text);
+                check(m != null && m.fromFile, names[i] + " reads");
+                if (m == null) continue;
+                check(m.faces.length >= 8000 && m.faces.length <= ModelObj.MAX_TRIS, names[i] + " keeps its detail: " + m.faces.length + " triangles");
+                float minX = 1e9f, maxX = -1e9f, minY = 1e9f, maxY = -1e9f, minZ = 1e9f, maxZ = -1e9f;
+                for (int v = 0; v < m.vertexCount; v++) {
+                    minX = Math.min(minX, m.verts[v * 3]); maxX = Math.max(maxX, m.verts[v * 3]);
+                    minY = Math.min(minY, m.verts[v * 3 + 1]); maxY = Math.max(maxY, m.verts[v * 3 + 1]);
+                    minZ = Math.min(minZ, m.verts[v * 3 + 2]); maxZ = Math.max(maxZ, m.verts[v * 3 + 2]);
+                }
+                float w = maxX - minX, th = maxY - minY, dp = maxZ - minZ;
+                check(w > 15f && w < 16.6f && th > 6f && th < 9.5f && dp > 8.5f && dp < 11.5f, names[i] + " has the real size in cm: " + w + " wide, " + th + " thick, " + dp + " deep");
+                check(Math.abs((minX + maxX) / 2) < 0.2f && Math.abs((minY + maxY) / 2) < 0.2f && Math.abs((minZ + maxZ) / 2) < 0.2f, names[i] + " is centred");
+                java.util.HashSet<Integer> ids = new java.util.HashSet<>();
+                for (int b : m.button) if (b >= 0) ids.add(b);
+                check(ids.size() >= 10, names[i] + " tags the faces of its buttons (" + ids.size() + " different buttons)");
+                // faces at the very top look up, faces at the very bottom look down (the winding was fixed for the app's culling)
+                float[] nrm = new float[3];
+                int up = 0, upN = 0, down = 0, downN = 0;
+                for (int f = 0; f < m.faces.length; f++) {
+                    float cy = (m.verts[m.faces[f][0] * 3 + 1] + m.verts[m.faces[f][1] * 3 + 1] + m.verts[m.faces[f][2] * 3 + 1]) / 3f;
+                    ControllerModel.normal(m.verts, m.faces[f], nrm);
+                    if (cy > maxY - 0.4f) { upN++; if (nrm[1] > 0) up++; }
+                    if (cy < minY + 0.4f) { downN++; if (nrm[1] < 0) down++; }
+                }
+                check(upN > 20 && up > upN * 0.5 && downN > 20 && down > downN * 0.5, names[i] + " faces point outward (" + up + "/" + upN + " on top, " + down + "/" + downN + " underneath)");
+                final java.io.File af = assets;
+                ModelObj.bundled = name -> new java.io.FileInputStream(new java.io.File(af, name));
+                ControllerModel b = ModelObj.loadBundled(pads[i]);
+                check(b != null && b.faces.length == m.faces.length && ModelObj.forType(null, pads[i]).fromFile, names[i] + " loads through the app's opener, and forType prefers it to the hand made model");
+                check(ModelObj.describe(null, pads[i]).startsWith("BUNDLED MODEL"), "the status text says which model is used");
+                ModelObj.bundled = null;
+                check(!ModelObj.forType(null, pads[i]).fromFile, "without the opener the hand made model is the last resort");
+            } catch (java.io.IOException e) {
+                check(false, "reading " + names[i] + " failed: " + e);
+            }
+        }
+        check(new java.io.File(assets, "dualsense.obj").length() < 450 * 1024 && new java.io.File(assets, "xbox-one.obj").length() < 450 * 1024, "each model file stays under 450 KB");
+    }
+
+    static void gyroIntro() {
+        section("2.18 the one-time gyro introduction");
+        check(GyroIntro.shouldOffer(false, false, true, true), "first time, home showing, a gyro controller: offered");
+        check(!GyroIntro.shouldOffer(true, false, true, true), "never twice");
+        check(!GyroIntro.shouldOffer(false, true, true, true), "it waits for the first run tutorial");
+        check(!GyroIntro.shouldOffer(false, false, false, true), "not while something else is open or Visor is not in front");
+        check(!GyroIntro.shouldOffer(false, false, true, false), "not without a controller that has a gyro");
+        check(GyroIntro.LINES.length == 2 && GyroIntro.LINES[0].length() < 100 && GyroIntro.LINES[1].length() < 110, "the welcome lines fit on one row each");
     }
 }

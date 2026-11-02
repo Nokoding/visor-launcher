@@ -111,7 +111,7 @@ if [ "$MODE" = status ]; then
 fi
 
 if [ "$MODE" = run ]; then
-  tvq pm path "$PKG" >/dev/null 2>&1 || [ -n "$APK" ] || die "Visor is not installed on the TV. Use --apk visor-launcher-v2.18-beta.apk or install it first."
+  tvq pm path "$PKG" >/dev/null 2>&1 || [ -n "$APK" ] || die "Visor is not installed on the TV. Use --apk visor-launcher-v2.19-beta.apk or install it first."
   echo "== plan (run)"
   [ -z "$APK" ] || echo "  install: adb install -r $APK"
   on access && echo "  access:  adb shell appops set $PKG GET_USAGE_STATS allow"

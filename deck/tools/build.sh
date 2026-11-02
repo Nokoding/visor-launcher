@@ -15,7 +15,7 @@ rm -rf "$B"; mkdir -p "$B/gen" "$B/classes" "$B/dex"
 "$BT/aapt2" link -o "$B/base.apk" -I "$JAR" \
   --manifest "$HERE/AndroidManifest.xml" \
   --min-sdk-version 28 --target-sdk-version 34 \
-  --version-code 22 --version-name 2.18-beta \
+  --version-code 23 --version-name 2.19-beta \
   -A "$HERE/assets" -0 ttf \
   --java "$B/gen" --proguard "$B/aapt-rules.pro" \
   "$B/res.zip"

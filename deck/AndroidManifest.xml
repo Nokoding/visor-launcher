@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.nokoding.deck"
-    android:versionCode="22"
-    android:versionName="2.18-beta">
+    android:versionCode="23"
+    android:versionName="2.19-beta">
 
     <uses-sdk android:minSdkVersion="28" android:targetSdkVersion="34" />
 

@@ -39,6 +39,7 @@ final class ControllerDraw {
             Mat3D.apply(mvp, v[i * 3] * S, v[i * 3 + 1] * S, v[i * 3 + 2] * S, tv, i * 3);
             Mat3D.project(tv[i * 3], tv[i * 3 + 1], tv[i * 3 + 2], DIST, FOCAL, cx, cy, sv, i * 2);
         }
+        if (m.fromFile) { drawMesh(c, t, m, fill); return; }
         int n0 = 0, n1 = 0;
         for (int f = 0; f < nf; f++) {
             int[] fc = m.faces[f];
@@ -59,6 +60,55 @@ final class ControllerDraw {
         boolean topVisible = facing[m.topFace] > 0.001f;
         if (topVisible) { faces(c, t, order0, n0, fill, line, path); faces(c, t, order1, n1, fill, line, path); }
         else { faces(c, t, order1, n1, fill, line, path); faces(c, t, order0, n0, fill, line, path); }
+    }
+
+    // ---- 2.18: real models (a few thousand triangles). One drawVertices call, a counting sort, nothing allocated per frame.
+    private float[] vpos = new float[0];
+    private int[] vcol = new int[0];
+    private int[] bucketCount = new int[SORT_BUCKETS + 1], sortTmp = new int[0];
+    private static final int SORT_BUCKETS = 2048;
+
+    private void drawMesh(Canvas c, Ui.Theme t, ControllerModel m, Paint fill) {
+        int nf = m.faces.length;
+        int n = 0;
+        float dmin = Float.MAX_VALUE, dmax = -Float.MAX_VALUE;
+        for (int f = 0; f < nf; f++) {
+            int[] fc = m.faces[f];
+            int a = fc[0] * 3, b = fc[1] * 3, d = fc[2] * 3;
+            float ax = tv[a], ay = tv[a + 1], az = tv[a + 2];
+            float ux = tv[b] - ax, uy = tv[b + 1] - ay, uz = tv[b + 2] - az, wx = tv[d] - ax, wy = tv[d + 1] - ay, wz = tv[d + 2] - az;
+            float nx = uy * wz - uz * wy, ny = uz * wx - ux * wz, nz = ux * wy - uy * wx;
+            float zx = (ax + tv[b] + tv[d]) * (1f / 3f), zy = (ay + tv[b + 1] + tv[d + 1]) * (1f / 3f), zz = (az + tv[b + 2] + tv[d + 2]) * (1f / 3f);
+            float vx = -zx, vy = -zy, vz = DIST - zz;
+            float nl = (float) Math.sqrt(nx * nx + ny * ny + nz * nz), vl = (float) Math.sqrt(vx * vx + vy * vy + vz * vz);
+            float fa = nl > 0 && vl > 0 ? (nx * vx + ny * vy + nz * vz) / (nl * vl) : 0f;
+            facing[f] = fa;
+            depth[f] = vl;
+            if (fa <= 0.001f) continue;
+            order0[n++] = f;
+            if (vl < dmin) dmin = vl;
+            if (vl > dmax) dmax = vl;
+        }
+        if (n == 0) return;
+        // far first, by a counting sort over the depth range (an insertion sort would be far too slow for thousands of faces)
+        if (sortTmp.length < n) sortTmp = new int[nf];
+        java.util.Arrays.fill(bucketCount, 0);
+        float span = Math.max(1e-3f, dmax - dmin), k = (SORT_BUCKETS - 1) / span;
+        for (int i = 0; i < n; i++) bucketCount[SORT_BUCKETS - 1 - (int) ((depth[order0[i]] - dmin) * k)]++;
+        int run = 0;
+        for (int i = 0; i < SORT_BUCKETS; i++) { int cnt = bucketCount[i]; bucketCount[i] = run; run += cnt; }
+        for (int i = 0; i < n; i++) { int f = order0[i]; sortTmp[bucketCount[SORT_BUCKETS - 1 - (int) ((depth[f] - dmin) * k)]++] = f; }
+        if (vpos.length < n * 6) { vpos = new float[nf * 6]; vcol = new int[nf * 3]; }
+        for (int i = 0; i < n; i++) {
+            int f = sortTmp[i];
+            int[] fc = m.faces[f];
+            for (int q = 0; q < 3; q++) { vpos[i * 6 + q * 2] = sv[fc[q] * 2]; vpos[i * 6 + q * 2 + 1] = sv[fc[q] * 2 + 1]; }
+            float fa = facing[f];
+            int col = Ui.mix(Ui.mix(t.panel, t.b, 0.10f + 0.62f * fa), t.a, (1f - fa) * 0.14f);
+            vcol[i * 3] = col; vcol[i * 3 + 1] = col; vcol[i * 3 + 2] = col;
+        }
+        fill.setStyle(Paint.Style.FILL);
+        c.drawVertices(Canvas.VertexMode.TRIANGLES, n * 6, vpos, 0, null, 0, vcol, 0, null, 0, 0, fill);
     }
 
     private void faces(Canvas c, Ui.Theme t, int[] order, int n, Paint fill, Paint line, Path path) {

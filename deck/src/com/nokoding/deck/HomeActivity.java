@@ -263,6 +263,8 @@ public final class HomeActivity extends Activity implements Engine.Host, IconCac
             wallDir = ext2 == null ? null : new File(ext2, "wallpapers");
             ControllerDraw.modelsDir = ext2 == null ? null : new File(ext2, "models");
             if (ControllerDraw.modelsDir != null) ControllerDraw.modelsDir.mkdirs();   // 2.17: so adb push has a folder
+            final android.content.res.AssetManager am = getAssets();
+            ModelObj.bundled = name -> am.open("models/" + name);   // 2.18: the models that ship in the app
         } catch (Throwable t) {
             wallDir = null;
         }
@@ -2755,6 +2757,7 @@ public final class HomeActivity extends Activity implements Engine.Host, IconCac
         testDevices = null;
         updateGyro();
         focusChanged(false);
+        if (v instanceof TutorialView) h.postDelayed(this::maybeOfferGyroIntro, 1500);
     }
 
     @Override public void closeTest(String toast) {
@@ -3697,13 +3700,41 @@ public final class HomeActivity extends Activity implements Engine.Host, IconCac
         else testBack = () -> openSettings(T_SYSTEM, "TUTORIAL");
     }
 
+    /** True when the connected controller reports a gyroscope (Android 12 and newer can ask). */
+    private boolean padHasGyro() {
+        try {
+            if (android.os.Build.VERSION.SDK_INT < 31) return false;
+            android.view.InputDevice d = GyroCalStore.pad(padId);
+            if (d == null) return false;
+            android.hardware.SensorManager sm = d.getSensorManager();
+            return sm != null && !sm.getSensorList(android.hardware.Sensor.TYPE_GYROSCOPE).isEmpty();
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    /** 2.18: the first time the home screen is showing with a gyro controller connected, open the gyro test with a welcome. Once. */
+    private void maybeOfferGyroIntro() {
+        try {
+            if (destroyed || safeMode || root == null || prefs == null) return;
+            boolean showing = resumed && panel == null && test == null && quick == null && preview == null;
+            TutorialProgress tp = TutorialProgress.parse(prefs.getString(TutorialProgress.PREF, ""));
+            if (!GyroIntro.shouldOffer(prefs.getBoolean(GyroIntro.PREF, false), tp.shouldOffer(), showing, padHasGyro())) return;
+            prefs.edit().putBoolean(GyroIntro.PREF, true).apply();   // asked once, by showing it
+            GyroTestView v = new GyroTestView(this, this, reduce, padId, gyroFollow, gyroStrength, gyroOn, calStore);
+            v.setIntro(true);
+            showTest(v, "GYRO TEST");
+            testBack = () -> { };
+        } catch (Throwable ignored) {}
+    }
+
     /** Once, a moment after Deck starts: the tutorial is offered if it was never finished or skipped. */
     private void maybeOfferTutorial() {
         try {
             if (destroyed || safeMode || root == null || !resumed) return;
             if (panel != null || test != null || quick != null || preview != null) return;
             TutorialProgress tp = TutorialProgress.parse(prefs.getString(TutorialProgress.PREF, ""));
-            if (!tp.shouldOffer()) return;
+            if (!tp.shouldOffer()) { maybeOfferGyroIntro(); return; }
             // asked once: leaving it in any way counts, so a crash or a power cut cannot make it come back every start
             tp.dismiss();
             prefs.edit().putString(TutorialProgress.PREF, tp.save()).apply();

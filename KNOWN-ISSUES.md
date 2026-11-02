@@ -18,7 +18,8 @@ Visor Launcher is a public beta. Almost every feature was written and tested on 
 - Whether the accessibility service ever sees the Home key (HOME KEY CHECK in ADVANCED REMAP tells you). Remapping Home only works if it does.
 - Whether the rumble check, SKIP NEXT and hold B in the gamepad test behave well with your controller.
 - The theme editor sliders with the D-pad and the stick, and the live preview speed.
-- The 3D controller models in the gyro test: how they look and draw. The shapes are approximate.
+- The 3D controller models in the gyro test: how smoothly they draw on a 1.4 GB box (12,000 triangles each, drawn in one call). The DualSense model's author says it is not from exact blueprints, so it is close but not exact. A painter's-algorithm drawing may show a wrong face order at some angles.
+- The gyro welcome on first launch only appears if the box reports the controller's gyroscope to the app (Android 12 or newer).
 - Video wallpapers (experimental): memory use, smoothness and start time on a 1.4 GB box. Try a short, small file first.
 - The helper scripts in deck/tools against a real TV (they were run against a fake adb).
 - Other boxes and TVs, including Fire TV and Nvidia Shield: unknown. Do not assume they work.

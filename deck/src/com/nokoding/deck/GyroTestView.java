@@ -56,6 +56,11 @@ final class GyroTestView extends TestScreen implements PadSensors.Sink {
     private static final float TW = 300, TH = 168;
     private static final float[] TPX = {-TW / 2, TW / 2, TW / 2, -TW / 2}, TPY = {-TH / 2, -TH / 2, TH / 2, TH / 2};
 
+    /** 2.18: opened by the first run introduction (see GyroIntro): a welcome in place of the usual first line. */
+    private boolean intro;
+
+    void setIntro(boolean on) { intro = on; }
+
     GyroTestView(Context c, Host host, boolean reduce, int preferredPad, boolean follow, int strengthPct, boolean gyroSwayOn, GyroCalStore store) {
         super(c, host, reduce, true);
         this.follow = follow;
@@ -210,13 +215,20 @@ final class GyroTestView extends TestScreen implements PadSensors.Sink {
         head.setColor(t.a);
         c.drawText("GYRO TEST", 96, 110, head);
         label.setColor(t.dim);
-        c.drawText("TILT AND TURN THE CONTROLLER. A (OK ON THE REMOTE) RECENTERS. X CALIBRATES. Y SWITCHES SWAY PREVIEW.", 96, 152, label);
+        if (intro) {
+            label.setColor(t.a);
+            c.drawText(GyroIntro.LINES[0], 96, 152, label);
+            label.setColor(t.dim);
+            c.drawText(GyroIntro.LINES[1], 96, 184, label);
+        } else {
+            c.drawText("TILT AND TURN THE CONTROLLER. A (OK ON THE REMOTE) RECENTERS. X CALIBRATES. Y SWITCHES SWAY PREVIEW.", 96, 152, label);
+        }
         mono.setColor(t.text);
-        c.drawText(sensors.status, 96, 200, mono);
+        c.drawText(sensors.status, 96, intro ? 224 : 200, mono);
         mono.setColor(t.dim);
-        c.drawText(devLine, 96, 232, mono);
+        c.drawText(devLine, 96, intro ? 256 : 232, mono);
         mono.setColor(cal.calibrated() ? t.a : t.dim);
-        c.drawText(calLine, 96, 264, mono);
+        c.drawText(calLine, 96, intro ? 288 : 264, mono);
 
         float right = att.tiltRight(), up = att.tiltUp();
         drawCorners(c, t, Mat3D.corner(right, up, 10f));

@@ -2,6 +2,12 @@
 
 Visor Launcher was developed privately as "Deck" until this public beta. Versions below are the internal numbers.
 
+## 2.19-beta
+
+- Detailed 3D models of a DualSense and an Xbox One style pad in the gyro test (12,000 triangles each, CC BY 4.0, credited in the README and NOTICE). Your own OBJ files still win, and the old hand-made shapes stay as a last resort.
+- The first time the home screen shows with a gyro controller connected, the gyro test opens once with a short welcome.
+- The website uses the same models.
+
 ## 2.18-beta (public beta)
 
 First public release. The same code as 2.17 plus:

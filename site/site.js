@@ -51,11 +51,12 @@ let glowSet = new Set(), glowAll = false;
 function showStill() { canvas.hidden = true; still.hidden = false; document.querySelectorAll('.toggle button').forEach(b => b.disabled = true); }
 
 async function start() {
-  let THREE, models;
+  let THREE; const models = {};
   try {
     const test = document.createElement('canvas');
     if (!(test.getContext('webgl2') || test.getContext('webgl'))) throw new Error('no webgl');
-    [THREE, models] = await Promise.all([import('./vendor/three.module.min.js'), fetch('models.json').then(r => r.json())]);
+    THREE = await import('./vendor/three.module.min.js');
+    models.dualsense = await fetch('models-dualsense.json').then(r => r.json());
   } catch (e) { showStill(); return; }
 
   let renderer;
@@ -65,47 +66,52 @@ async function start() {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
   camera.position.set(0, 24, 36); camera.lookAt(0, -0.5, 0);
-  scene.add(new THREE.AmbientLight(0xffffff, 0.75));
-  const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(-6, 12, 10); scene.add(key);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+  const key = new THREE.DirectionalLight(0xffffff, 2.2); key.position.set(-6, 12, 10); scene.add(key);
   const rim = new THREE.DirectionalLight(0xa855f7, 1.2); rim.position.set(8, 2, -8); scene.add(rim);
 
-  const COL = { body: new THREE.Color(0x2a1747), deco: new THREE.Color(0x8a3b9e), hw: new THREE.Color(0x3d2570), glow: new THREE.Color(0xff2e97), glowHw: new THREE.Color(0xff6fb8) };
+  const COL = { body: new THREE.Color(0x4a2a7a), deco: new THREE.Color(0xa24bc0), hw: new THREE.Color(0x5a3590), glow: new THREE.Color(0xff2e97), glowHw: new THREE.Color(0xff6fb8) };
   const group = new THREE.Group(); scene.add(group);
   const built = {};
 
   function build(name) {
     const m = models[name];
     const pos = [], col = [], nrm = [], faceOf = [];
-    const v = i => new THREE.Vector3(m.v[i * 3], m.v[i * 3 + 1], m.v[i * 3 + 2]);
-    m.f.forEach((f, fi) => {
-      const a = v(f[0]);
-      for (let k = 1; k < f.length - 1; k++) {
-        const b = v(f[k]), c = v(f[k + 1]);
-        const n = new THREE.Vector3().subVectors(b, a).cross(new THREE.Vector3().subVectors(c, a)).normalize();
-        [a, b, c].forEach(p => { pos.push(p.x, p.y, p.z); nrm.push(n.x, n.y, n.z); col.push(0, 0, 0); faceOf.push(fi); });
-      }
-    });
+    const V = i => new THREE.Vector3(m.v[i * 3], m.v[i * 3 + 1], m.v[i * 3 + 2]);
+    for (let fi = 0; fi < m.t.length / 3; fi++) {
+      const a = V(m.t[fi * 3]), b = V(m.t[fi * 3 + 1]), c = V(m.t[fi * 3 + 2]);
+      const n = new THREE.Vector3().subVectors(b, a).cross(new THREE.Vector3().subVectors(c, a)).normalize();
+      [a, b, c].forEach(p => { pos.push(p.x, p.y, p.z); nrm.push(n.x, n.y, n.z); col.push(0, 0, 0); faceOf.push(fi); });
+    }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
     geo.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3));
     geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
-    const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0.15, flatShading: true }));
-    const lines = new THREE.LineSegments(new THREE.EdgesGeometry(geo, 25), new THREE.LineBasicMaterial({ color: 0xff2e97, transparent: true, opacity: 0.55 }));
+    const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, metalness: 0.15, flatShading: true, side: THREE.DoubleSide }));
+    const lines = new THREE.LineSegments(new THREE.EdgesGeometry(geo, 35), new THREE.LineBasicMaterial({ color: 0xff2e97, transparent: true, opacity: 0.28 }));
     const g = new THREE.Group(); g.add(mesh, lines);
     return { g, geo, faceOf, m };
   }
   function paint(b) {
     const colA = b.geo.getAttribute('color'), n = colA.count;
     for (let i = 0; i < n; i++) {
-      const fi = b.faceOf[i], grp = b.m.g[fi], btn = b.m.b[fi];
-      const lit = btn >= 0 && (glowAll || glowSet.has(btn));
-      const c = lit ? (grp === 2 ? COL.glowHw : COL.glow) : (grp === 1 ? COL.deco : grp === 2 ? COL.hw : COL.body);
+      const btn = b.m.b[b.faceOf[i]];
+      let lit = false;
+      if (btn >= 0) {
+        // the front corner faces are bumper and trigger together (4,5 and 6,7)
+        const want = glowAll || glowSet.has(btn) || ((btn === 4 && glowSet.has(6)) || (btn === 5 && glowSet.has(7)));
+        lit = want;
+      }
+      const c = lit ? COL.glow : COL.body;
       colA.setXYZ(i, c.r, c.g, c.b);
     }
     colA.needsUpdate = true;
   }
   let current = null, which = 'dualsense';
-  function use(name) {
+  async function use(name) {
+    if (!models[name]) {
+      try { models[name] = await fetch('models-' + name + '.json').then(r => r.json()); } catch (e) { return; }
+    }
     which = name;
     if (current) group.remove(current.g);
     built[name] = built[name] || build(name);
@@ -141,7 +147,7 @@ async function start() {
     const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
     const p = reduce ? 0 : window.scrollY / max;
     group.rotation.y = -0.45 + p * Math.PI * 4;          // two turns over the whole page
-    group.rotation.x = reduce ? 0.12 : 0.12 + Math.sin(p * Math.PI * 6) * 0.08;
+    group.rotation.x = reduce ? 0.62 : 0.62 + Math.sin(p * Math.PI * 6) * 0.1;
   }
   function draw() { if (!visible) return; pose(); renderer.render(scene, camera); }
   function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; draw(); }); } }

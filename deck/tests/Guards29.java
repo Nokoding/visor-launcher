@@ -24,7 +24,7 @@ final class Guards29 {
             File deck = new File(dir, "../../../..");
             String mf = read(new File(deck, "AndroidManifest.xml"));
             String build = read(new File(deck, "tools/build.sh"));
-            check(build.contains("--version-code 22 --version-name 2.18-beta") && mf.contains("android:versionCode=\"22\"") && mf.contains("android:versionName=\"2.18-beta\""), "version 22 / 2.18-beta in the manifest and build.sh");
+            check(build.contains("--version-code 23 --version-name 2.19-beta") && mf.contains("android:versionCode=\"23\"") && mf.contains("android:versionName=\"2.19-beta\""), "version 23 / 2.19-beta in the manifest and build.sh");
             java.util.regex.Matcher m = java.util.regex.Pattern.compile("<uses-permission android:name=\"([^\"]+)\"").matcher(mf);
             int perms = 0;
             while (m.find()) perms++;

@@ -118,7 +118,9 @@ final class ControllerModel {
     }
 
     /** 2.17: a model read from a file (see ModelObj). Every face is body (group 0), no buttons light up. */
-    ControllerModel(int padType, float[] v, int[][] f) {
+    ControllerModel(int padType, float[] v, int[][] f) { this(padType, v, f, null); }
+
+    ControllerModel(int padType, float[] v, int[][] f, int[] btn) {
         type = PadTest.layout(padType);
         fromFile = true;
         verts = v;
@@ -128,6 +130,7 @@ final class ControllerModel {
         button = new int[f.length];
         part = new int[f.length];
         java.util.Arrays.fill(button, -1);
+        if (btn != null && btn.length == f.length) System.arraycopy(btn, 0, button, 0, btn.length);
         int best = 0;
         float bestY = -1e9f;
         float[] n = new float[3];
