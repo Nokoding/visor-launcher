@@ -14,7 +14,7 @@ import java.util.Locale;
  * Setup > PAD > GYRO TEST. A low poly controller drawn with Canvas only (ControllerDraw)
  * follows the real controller. Orientation comes from Attitude, a complementary filter on the
  * controller's gyroscope and accelerometer. Also a tilt level with a one second trail, the raw
- * numbers, four corner markers and SWAY PREVIEW, a mock tile driven by the real gyro sway
+ * numbers, four corner markers and SWAY PREVIEW, a tile driven by the real gyro sway
  * settings. Sensor listeners exist only while this screen is open and resumed.
  *
  * 2.3: raw samples go through the controller's saved GyroCal (bias removed, measured axes),

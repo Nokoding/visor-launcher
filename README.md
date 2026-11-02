@@ -55,6 +55,8 @@ Visor Launcher is a home screen for Android TV and Google TV boxes, made for peo
 
 ![Setup with row help](docs/images/setup-help.webp)
 
+Website: https://nokoding.github.io/visor-launcher/ (when GitHub Pages is switched on for this repository; the source is in `site/`).
+
 ## Who it is for
 
 People with an Android TV or Google TV box who use a controller, and who do not mind running a few adb commands once. It also works with just a remote, with fewer features. If you want something that installs from a store with one tap, this is not that yet.

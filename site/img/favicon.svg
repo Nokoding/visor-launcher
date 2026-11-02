@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Visor Launcher logo"><title>Visor Launcher</title><rect width="512" height="512" rx="72" fill="#07040D"/>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FF2E97"/><stop offset="1" stop-color="#A855F7"/></linearGradient>
+  </defs>
+  <g stroke="#FF2E97" stroke-width="14" stroke-linecap="square" fill="none">
+    <path d="M56 136V56H136"/><path d="M456 136V56H376"/><path d="M56 376V456H136"/><path d="M456 376V456H376"/>
+  </g>
+  <g stroke="#A855F7" stroke-width="8" stroke-linecap="square" fill="none">
+    <path d="M256 56V84"/><path d="M256 456V428"/><path d="M56 256H84"/><path d="M456 256H428"/>
+  </g>
+  <path d="M88 236L146 188H366L424 236L404 306L340 340H276L256 318L236 340H172L108 306Z" fill="url(#g)"/>
+  <path d="M128 240L168 214H344L384 240L372 280L330 300H290L256 282L222 300H182L140 280Z" fill="#07040D"/>
+  <path d="M152 252H360" stroke="#F4EEFF" stroke-width="6" stroke-linecap="round" opacity="0.85"/>
+</svg>

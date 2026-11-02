@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visor Launcher: The Android launcher for gamers</title>
+<meta name="description" content="Visor Launcher is a public beta home screen for Android TV and Google TV with a PS style menu over your games, performance mode, game profiles, stick volume and a gamepad test. No internet permission.">
+<meta name="theme-color" content="#07040D">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Visor Launcher: The Android launcher for gamers">
+<meta property="og:description" content="A public beta launcher for Android TV and Google TV, made for controllers. No internet permission.">
+<meta property="og:image" content="https://nokoding.github.io/visor-launcher/img/og.png">
+<meta property="og:image:alt" content="Visor Launcher logo and tagline">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the content</a>
+<header class="top">
+  <a class="brand" href="#top" aria-label="Visor Launcher, top of the page"><img src="img/favicon.svg" width="36" height="36" alt=""><span>VISOR</span></a>
+  <nav aria-label="Sections">
+    <a href="#features">Features</a>
+    <a href="#install">Install</a>
+    <a href="#safety">Safety</a>
+    <a href="#faq">FAQ</a>
+    <a class="gh" href="https://github.com/Nokoding/visor-launcher">GitHub</a>
+  </nav>
+</header>
+
+<div id="stage" class="stage" aria-hidden="false">
+  <canvas id="gl" width="800" height="600" aria-hidden="true"></canvas>
+  <img id="still" class="still" src="img/controller-still.webp" alt="A low-poly 3D drawing of a game controller in the Visor colors" width="800" height="600" hidden>
+  <div class="stage-ui">
+    <div class="toggle" role="group" aria-label="Controller shape">
+      <button type="button" id="t-ds" aria-pressed="true">DualSense style</button>
+      <button type="button" id="t-xb" aria-pressed="false">Xbox style</button>
+    </div>
+    <p id="glow-note" class="glow-note" aria-live="polite"></p>
+  </div>
+</div>
+
+<main id="main">
+<section class="hero frame" id="top" aria-labelledby="h-title">
+  <img class="logo" src="img/favicon.svg" width="112" height="112" alt="Visor Launcher logo: a visor slit inside lock-on corner brackets">
+  <p class="eyebrow">// PUBLIC BETA</p>
+  <h1 id="h-title" data-type>Visor Launcher</h1>
+  <p class="tagline">The Android launcher for gamers</p>
+  <p class="lead">A home screen for Android TV and Google TV with a PS style menu that opens over your game. No internet permission.</p>
+  <p class="cta">
+    <a class="btn primary" id="dl" href="https://github.com/Nokoding/visor-launcher/releases">DOWNLOAD BETA <span id="dl-meta" class="meta"></span></a>
+    <a class="btn" href="https://github.com/Nokoding/visor-launcher/blob/main/docs/guide-laptop.md">Read the guide</a>
+  </p>
+  <p class="small">The beta is a pre-release. On the releases page open the newest entry marked "Pre-release". Check the SHA-256 in its notes before you install.</p>
+</section>
+
+<section id="features" class="block" aria-labelledby="h-features">
+  <h2 id="h-features" data-type>Built around the controller</h2>
+  <p class="sub">Scroll down. The controller on the right lights up the buttons each feature uses. These are rendered previews, not photos of a TV.</p>
+
+  <article class="feature frame" data-glow="16" data-note="Lit: the PS button">
+    <div class="ftext">
+      <h3 data-type>The control center over your game</h3>
+      <p>Press the PS button during a game and a menu opens over it: volume, media keys, screenshot and a task manager. The game keeps running underneath. It needs one optional setting that you switch on once with adb.</p>
+    </div>
+    <img src="img/cc-quick.webp" loading="lazy" width="800" height="450" alt="The Visor control center with a volume bar and tiles for mute, play pause, next, previous, screenshot, sleep, home and back">
+  </article>
+
+  <article class="feature frame" data-glow="4,5" data-note="Lit: the bumpers">
+    <div class="ftext">
+      <h3 data-type>Performance mode and EXIT GAME</h3>
+      <p>When a game starts, Visor can close the background processes of other apps, and it shows the free memory before and after so you can judge it. EXIT GAME goes home and closes the game. Android keeps some apps alive, so the gain can be small.</p>
+    </div>
+    <img src="img/cc-apps.webp" loading="lazy" width="800" height="450" alt="The control center APPS page listing running apps with a close option">
+  </article>
+
+  <article class="feature frame" data-glow="0,1,2,3" data-note="Lit: the face buttons">
+    <div class="ftext">
+      <h3 data-type>Game profiles</h3>
+      <p>Lower the display scale for one game and give it its own performance mode and volume. If the box refuses the in-app method, a phone helper script does it with adb.</p>
+    </div>
+    <img src="img/game-profile.webp" loading="lazy" width="800" height="450" alt="A game profile screen showing scale, method, auto restore and launch options for an example game">
+  </article>
+
+  <article class="feature frame" data-glow="8,9" data-note="Lit: the sticks">
+    <div class="ftext">
+      <h3 data-type>Stick volume</h3>
+      <p>Hold a key and spin the right stick to change the volume, like a click wheel. It also works with a finger on the DualSense touchpad. The speed is a setting.</p>
+    </div>
+    <img src="img/ps-overlay.webp" loading="lazy" width="800" height="450" alt="The Visor quick menu open over a racing game with a volume row">
+  </article>
+
+  <article class="feature frame" data-glow="all" data-note="Lit: every button, like the test">
+    <div class="ftext">
+      <h3 data-type>The gamepad test</h3>
+      <p>Check every button, stick and trigger, with a checklist, a skip for buttons the box never reports, a rumble check and a small report. Hold the circle button to leave.</p>
+    </div>
+    <img src="img/gamepad-test.webp" loading="lazy" width="800" height="450" alt="The gamepad test screen with a controller drawing, a 11 of 16 button count and trigger bars">
+  </article>
+
+  <article class="feature frame" data-glow="6,7,4,5" data-note="Lit: bumpers and triggers">
+    <div class="ftext">
+      <h3 data-type>Button remap and combos</h3>
+      <p>Make spare remote buttons run actions and make two-button combos on a controller. It is built not to lock you out: hold Back for 6 seconds to clear it.</p>
+    </div>
+    <img src="img/remap.webp" loading="lazy" width="800" height="450" alt="The remap tab listing channel up, channel down, TV button and input button with example actions">
+  </article>
+
+  <article class="feature frame" data-glow="14,15" data-note="Lit: start and select">
+    <div class="ftext">
+      <h3 data-type>Themes, wallpapers and packs</h3>
+      <p>A theme editor with a readability check, layered and animated wallpapers (video is experimental), a screensaver, and sound and icon packs. Everything is a file you can share. Packs get onto the TV with adb, because there is no internet permission.</p>
+    </div>
+    <img src="img/theme-editor.webp" loading="lazy" width="800" height="450" alt="The theme editor with hue, saturation and brightness sliders, a hex value and a readability line">
+  </article>
+
+  <article class="feature frame" data-glow="17" data-note="Lit: the touchpad">
+    <div class="ftext">
+      <h3 data-type>The basics are there</h3>
+      <p>A wheel or a grid for your apps, a dock with recent apps, a stats strip, and a one-line help under every row in Setup. A tutorial teaches the controls.</p>
+    </div>
+    <img src="img/wheel.webp" loading="lazy" width="800" height="450" alt="The Visor home screen as a wheel of example apps with a focused tile and a dock">
+  </article>
+</section>
+
+<section id="install" class="block" aria-labelledby="h-install">
+  <h2 id="h-install" data-type>How it works in three steps</h2>
+  <ol class="steps">
+    <li><strong>Prepare the TV.</strong> Turn on developer options and Wireless debugging.</li>
+    <li><strong>Connect and install.</strong> Pair with adb, then <code>adb install -r</code> the APK from the releases page.</li>
+    <li><strong>Switch on the extras.</strong> Optional one-time grants for the menu over games and the task manager.</li>
+  </ol>
+  <div class="guides">
+    <a class="guide frame" href="https://github.com/Nokoding/visor-launcher/blob/main/docs/guide-laptop.md"><strong>I use a laptop</strong><span>Windows, macOS or Linux. Platform-tools, adb, the exact commands.</span></a>
+    <a class="guide frame" href="https://github.com/Nokoding/visor-launcher/blob/main/docs/guide-termux.md"><strong>I use only my phone</strong><span>Termux from F-Droid, adb on the phone, the same steps.</span></a>
+  </div>
+</section>
+
+<section id="safety" class="block" aria-labelledby="h-safety">
+  <h2 id="h-safety" data-type>Safety and honesty</h2>
+  <ul class="list">
+    <li><strong>No internet permission.</strong> Visor cannot send anything off your TV. The permissions are listed in the README.</li>
+    <li><strong>The overlay is optional.</strong> The accessibility service that lets the menu open over games is off until you switch it on. It sees key presses and controller movement. It does not read the screen.</li>
+    <li><strong>Everything has an undo.</strong> Hold Back for 6 seconds to clear remaps. Two adb commands reset the display. Uninstalling removes it.</li>
+    <li><strong>Turning off Google TV's own launcher is optional</strong> and is the last step in the guides, with its undo.</li>
+    <li><strong>It is a beta.</strong> Most features were tested on a computer and tried on one box, an onn. Full HD Streaming Device. Other boxes are unknown, including Fire TV and Nvidia Shield. <a href="https://github.com/Nokoding/visor-launcher/blob/main/KNOWN-ISSUES.md">Known issues</a> lists what is not verified.</li>
+  </ul>
+</section>
+
+<section id="faq" class="block" aria-labelledby="h-faq">
+  <h2 id="h-faq" data-type>FAQ</h2>
+  <div class="faq">
+<!-- FAQ:START (generated by deck/tools/make-site-faq.py from docs/faq.md) -->
+<details><summary>What is Visor Launcher?</summary><p>A launcher (home screen) for Android TV and Google TV boxes, made with a game controller in mind. It has a wheel and a grid for your apps, a PS style menu you can open over a game, performance mode, game profiles, stick volume, a gamepad test, themes, wallpapers, a screensaver and a tutorial. The tagline is "The Android launcher for gamers".</p></details>
+<details><summary>Is it safe?</summary><p>It has no INTERNET permission, so it cannot send anything off your TV. You can check: <code>aapt2 dump badging visor-launcher-*.apk</code> lists the permissions, and the README lists them too. The code is open and builds with plain tools.</p><p>The optional <strong>accessibility service</strong> (the "overlay service", off until you switch it on) is how the PS style menu can appear over other apps. While it is on, Android lets it see key presses and controller movement, which it needs to spot the PS button and to run your remaps, combos and volume gestures. It also notes which app is in front, only to skip apps you told it to leave alone. It does not read what is on the screen. The one exception is the task manager's experimental Force stop, which you start yourself and which presses the buttons on an app's App Info page. It stores nothing about the apps you use. You can turn it off any time.</p></details>
+<details><summary>Which devices work?</summary><p>It was tried on one box: an onn. Full HD Streaming Device (Google TV, Android 14, 1.4 GB RAM) with a DualSense controller. Everything else is unknown. Android 9 or newer is the target (minSdk 28), but only newer versions were used.</p></details>
+<details><summary>Do I need a controller?</summary><p>No. The remote works for browsing. The controller-only parts are the PS style menu, stick volume, touchpad volume, the gamepad and gyro tests and the combos. A DualSense and an Xbox style controller are the ones it was built around.</p></details>
+<details><summary>Does it work with Google TV and Android TV?</summary><p>It is built for both. On Google TV the stock launcher still answers the Home button unless you turn it off (see below), so on Google TV Visor is more of an app you open than a replacement home screen until you do the optional last step.</p></details>
+<details><summary>Can I go back to the stock launcher?</summary><p>Yes. Uninstall Visor (<code>adb uninstall com.nokoding.deck</code>). If you turned the stock launcher off, turn it back on first: <code>adb shell pm enable com.google.android.apps.tv.launcherx</code> and give it the home role again. The guides (<a href="https://github.com/Nokoding/visor-launcher/blob/main/docs/guide-laptop.md">laptop</a>, <a href="https://github.com/Nokoding/visor-launcher/blob/main/docs/guide-termux.md">phone</a>) have the exact commands.</p></details>
+<details><summary>How do I update?</summary><p>Download the new APK from the Releases page, check its SHA-256, and run <code>adb install -r</code> on it. Your settings stay. It only works over a build signed with the same key.</p></details>
+<details><summary>Why is adb needed?</summary><p>Android does not let an ordinary app switch on its own accessibility service, read the usage history of other apps, or change the display. Those things need a one-time command that only adb (or a computer or phone with developer access) can give. You do them once. Visor works without them, with fewer features.</p></details>
+<details><summary>Why does Home still open the Google TV home screen?</summary><p>Google TV's own launcher answers the Home button as long as it is enabled. To change that you can turn it off with one adb command. That step is optional and the last one in the guides, because if nothing else answers Home you can end up without a home screen until you undo it. The undo is in the guides.</p></details>
+<details><summary>What happens if a remap locks me out?</summary><p>Hold the Back button for 6 seconds, anywhere. It clears the D-pad, OK and Back remaps. Or, from adb: <code>adb shell am start -n com.nokoding.deck/.HomeActivity --es deck_cmd reset_remap</code>. Or Setup, REMAP, RESET ALL REMAPS. Some buttons (Power, the PS button, game buttons) cannot be remapped at all, and Home needs extra warnings and has its own five-press escape.</p></details>
+<details><summary>Does it work on Fire TV or Nvidia Shield?</summary><p>Unknown. Nobody has tried. It might, it might not. Please tell us if you do.</p></details>
+<details><summary>Why no internet permission, and how do wallpapers, themes and packs get on the TV?</summary><p>Because a launcher that cannot go online cannot leak anything, and does not need an update server. Wallpapers, themes, sound packs and icon packs are files that you push to the TV with adb from a computer or a phone. There are small scripts for it, and there is a page that runs on your phone (not on the TV) for sending wallpapers from its browser. See <a href="https://github.com/Nokoding/visor-launcher/blob/main/docs/wallpapers.md">wallpapers.md</a>, <a href="https://github.com/Nokoding/visor-launcher/blob/main/docs/themes.md">themes.md</a>, <a href="https://github.com/Nokoding/visor-launcher/blob/main/docs/sound-packs.md">sound-packs.md</a> and <a href="https://github.com/Nokoding/visor-launcher/blob/main/docs/icon-packs.md">icon-packs.md</a>.</p></details>
+<details><summary>How much battery, RAM or CPU does it use?</summary><p>Not measured properly. The target box has 1.4 GB of RAM, so the code keeps one decoded wallpaper at a time and frees things when you leave. Video wallpapers are experimental and may not suit a box that small. If you measure it, please share the numbers.</p></details>
+<details><summary>How do I report a bug?</summary><p>Open an issue with the bug report form on GitHub. Say which TV or box, which controller, which Android version, and what you pressed.</p></details>
+<details><summary>What is the licence?</summary><p>The code is MIT. The docs and images are CC BY 4.0. The fonts keep the SIL Open Font License. See <a href="https://github.com/Nokoding/visor-launcher/blob/main/NOTICE">NOTICE</a>.</p></details>
+<details><summary>Is it related to Steam Deck?</summary><p>No. Visor is not related to the Steam Deck, the Valve handheld, or to any hardware or software that is also called Visor (for example a low vision magnifier app and an AR headset company use the same word). The word "Launcher" in the name is what sets this project apart. It is also not affiliated with or endorsed by Google, Sony, Microsoft or Valve.</p></details>
+<details><summary>Why is the package called com.nokoding.deck?</summary><p>The project was called Deck before it was called Visor. The package name stays so that older installs update in place.</p></details>
+<details><summary>Can I make my own theme, sound pack or icon pack?</summary><p>Yes. <a href="https://github.com/Nokoding/visor-launcher/blob/main/docs/themes.md">themes.md</a> explains the theme editor and the theme file. <a href="https://github.com/Nokoding/visor-launcher/blob/main/docs/sound-packs.md">sound-packs.md</a>, <a href="https://github.com/Nokoding/visor-launcher/blob/main/docs/icon-packs.md">icon-packs.md</a> and <a href="https://github.com/Nokoding/visor-launcher/blob/main/docs/wallpapers.md">wallpapers.md</a> explain the packs.</p></details>
+<details><summary>Why is it a beta?</summary><p>Almost everything was written and tested on a computer, and tried on one box. Several features were never tried on a real TV, and a few things were found not to work on that box. <a href="https://github.com/Nokoding/visor-launcher/blob/main/KNOWN-ISSUES.md">KNOWN-ISSUES.md</a> lists what, honestly.</p></details>
+<!-- FAQ:END -->
+  </div>
+</section>
+</main>
+
+<footer>
+  <p><a href="https://github.com/Nokoding/visor-launcher">GitHub</a> · Code MIT, docs and images CC BY 4.0, fonts SIL OFL · <a href="https://github.com/Nokoding/visor-launcher/blob/main/NOTICE">Notice</a></p>
+  <p>Visor Launcher is a public beta. It is not affiliated with or endorsed by Google, Sony, Microsoft or Valve. Android, Android TV, Google TV, PlayStation, DualSense, Xbox and Steam Deck are trademarks of their owners, used as plain text names only. Visor is not related to the Steam Deck.</p>
+</footer>
+<script type="module" src="site.js"></script>
+</body>
+</html>
